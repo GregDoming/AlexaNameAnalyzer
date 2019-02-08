@@ -1,0 +1,22 @@
+{
+  "name": "alexanameanalyzer",
+  "version": "1.0.0",
+  "description": "Alexa First Name Analyzer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GregDoming/AlexaNameAnalyzer.git"
+  },
+  "author": "Greg Domingue",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GregDoming/AlexaNameAnalyzer/issues"
+  },
+  "homepage": "https://github.com/GregDoming/AlexaNameAnalyzer#readme",
+  "dependencies": {
+    "ask-sdk-model": "^1.11.2"
+  }
+}
