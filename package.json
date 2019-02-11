@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/GregDoming/AlexaNameAnalyzer#readme",
   "dependencies": {
+    "ask-sdk-core": "^2.3.0",
     "ask-sdk-model": "^1.11.2"
   }
 }
