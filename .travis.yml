@@ -2,7 +2,7 @@ language: node_js
 deploy:
   provider: lambda
   function_name: "lambda-test"
-  region: "us-west-1"
+  region: "us-west-2"
   role: "arn:aws:iam::0123456789012:role/lambda_basic_execution"
-  runtime: "nodejs4.3"
-  handler_name: "handler"
+  runtime: "nodejs8.10"
+  handler_name: "nameAnalyzer"
