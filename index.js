@@ -85,7 +85,8 @@ const ErrorHandler = {
       .getResponse();
   },
 };
-
+ console.log('we did it');
+ 
 exports.handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
@@ -95,4 +96,3 @@ exports.handler = Alexa.SkillBuilders.custom()
     SessionEndedRequestHandler)
   .addErrorHandlers(ErrorHandler)
   .lambda();
-  
