@@ -1,15 +1,11 @@
 language: node_js
 node_js:
 - node
-branches:
-  only: master
 deploy:
   provider: lambda
-  function_name: "lambda-test"
+  function_name: "nameAnalyzer"
   region: "us-west-2"
   role: "arn:aws:iam::822617710188:user/Administrator"
   runtime: "nodejs8.10"
   handler_name: "nameAnalyzer"
-  secret_access_key: "AKIAITCQW67AHBW4INIA"
-  access_key_id: "XF9HDBgY+G3epuDHVAGt5QNSEpNUeSKRa5b9wpdh"
     
