@@ -14,27 +14,22 @@ const LaunchRequestHandler = {
       .getResponse();
   },
 };
-const genderNameIntentHandler = {
-  canFulfill(handlerInput) {
-    return handlerInput.requestEnvelope.request.intent.name === 'AMAZON.DE_FIRST_NAME'
-  }
-
-}
-
-const HelloWorldIntentHandler = {
+const NameIntentHandler = {
   canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && handlerInput.requestEnvelope.request.intent.name === 'HelloWorldIntent';
+    return handlerInput.requestEnvelope.request.intent.name === 'AMAZON.DE_FIRST_NAME'
+      && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameIntent'
   },
   handle(handlerInput) {
-    const speechText = 'Hello World!';
+    const slots = handlerInput.requestEnvelope.request.intent.slots;
+    const userName = slots['name'].value;
+    const speechText = `Your name is: ${userName}`
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .withSimpleCard('Hello World', speechText)
+      .withSimpleCard('Your name is', userName)
       .getResponse();
   },
-};
+}
 
 const HelpIntentHandler = {
   canHandle(handlerInput) {
@@ -63,7 +58,7 @@ const CancelAndStopIntentHandler = {
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .withSimpleCard('Hello World', speechText)
+      .withSimpleCard('Goodbye', speechText)
       .getResponse();
   },
 };
@@ -86,8 +81,8 @@ const ErrorHandler = {
     console.log(`Error handled: ${error.message}`);
 
     return handlerInput.responseBuilder
-      .speak('Sorry, I can\'t understand the command. Please say again.')
-      .reprompt('Sorry, I can\'t understand the command. Please say again.')
+      .speak('Sorry, I can\'t understand the command. Please say your name.')
+      .reprompt('Sorry, I can\'t understand the command. Please say your name.')
       .getResponse();
   },
 };
