@@ -4,11 +4,11 @@ const dotenv = require('dotenv');
 
 
 const zip = new AdmZip();
-//adds the folder and all the colders children to the zip que
-zip.addLocalFile('lambda/index.js');
-zip.addLocalFile('lambda/package.json');
-zip.addLocalFolder('lambda/node_modules');
-//zips all files in the zip que
+//  adds the folder and all the colders children to the zip que 
+
+zip.addLocalFolder('lambda');
+//  zips all files in the zip que
+
 zip.writeZip('deployment/lambda_zip/nameAnalyzer.zip');
 
 // const bufferedZip = zip.toBuffer();

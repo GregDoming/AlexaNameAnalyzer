@@ -4,7 +4,6 @@
   "description": "Alexa First Name Analyzer",
   "main": "index.js",
   "dependencies": {
-    "aws-sdk": "^2.401.0",
-    "dotenv": "^6.2.0"
+    "ask-sdk": "^2.3.0",
   }
 }
