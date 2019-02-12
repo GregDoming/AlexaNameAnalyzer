@@ -3,11 +3,11 @@ node_js:
 - node
 deploy:
   provider: lambda
-  access_key_id: "${AWS_ACCESS_KEY}"
-  secret_access_key: "${AWS_SECRET_KEY}"
-  function_name: "nameAnalyzer"
-  region: "us-west-2"
-  role: "arn:aws:iam::822617710188:user/Administrator"
-  runtime: "nodejs8.10"
-  handler_name: "nameAnalyzer"
-    
+  secret_access_key:
+    secure: PqADOv/wA0byQNuCJdMr4P1bdFeCHKPyC2cQELdoFmzvw6bR2ylZGBlAIr8xXJd4YrZbbkN12lzhJl7n/HYcc9MVdk5FP9Ws4bXU7dOBl5VUojrqPhS9TqC1w6YrGbD+7rogLFUTuxyCA+ggRnNd5i9j4IQON+guRNV8Qr8nEAJfsnmI7xtyX9bGJ9ZLFrvzgM9T/HIeZPk2wg+iXRnrg+M+1JwezWE8+5/EqMX7nx1DkylTd/bHRZsdQvl7QqpZ0WtReVauKHB6HEHyTlVm1Y4WevqICBCxNFYiPGlmbIy6467pB4usva/q79XBbIpAQAFzXvfvM8VgBEDJwsS3azEmocAURzWdq0aAJqQxUiJYMotfWy6Q+mPOr5s55msX/pmMw2GBoWx4EOAG1tZTT2mVoxCr61vAPuJEphqHeJMNr5Nt2PRV3sFtQUVQ+Ngky4chb+IYNunnx3jqZoyKgQCBlDQYPlJV8YYk39eat6rb9qvPY+GfpRMl0xvXFXkFwDNirvgNDOQo+dCb2K6DxipS+E+5m0Y/IBAD17SlA8PSwwqyhvd1fEaI2It5wqd/Iy6JsUSOE2pDt+Y6jfh70O55seINxVHXFtZtSRQdNh3i939uekvaWZMuD3uDkK9/iUzNyZxz2fR2Mb3jkTb1d2orLkctfx1AZ6m10yRXEuw=
+  function_name: nameAnalyzer
+  region: us-west-2
+  role: arn:aws:iam::822617710188:role/TestRole
+  runtime: nodejs8.10
+  handler_name: handler
+

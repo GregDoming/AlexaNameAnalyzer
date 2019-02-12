@@ -1,4 +1,5 @@
 const Alexa = require('ask-sdk-core');
+const dotenv = require('dotenv').config();
 
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
@@ -71,6 +72,7 @@ const SessionEndedRequestHandler = {
     return handlerInput.responseBuilder.getResponse();
   },
 };
+console.log(process.env.GREG)
 
 const ErrorHandler = {
   canHandle() {
