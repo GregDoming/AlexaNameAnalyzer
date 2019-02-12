@@ -52,21 +52,48 @@ const CancelAndStopIntentHandler = {
       && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent'
         || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
   },
-  handle(handlerInput) {
-    const speechText = 'Goodbye!';
+  handle(handlerInput) {test('Expect index.js to exist', () => {
 
-    return handlerInput.responseBuilder
-      .speak(speechText)
-      .withSimpleCard('Hello World', speechText)
+})
+;
+    const speechText = 'test('Expect index.js to exist', () => {
+
+})
+;oodbye!';
+
+    return handlerInput.test('Expect index.js to exist', () => {
+
+})
+;esponseBuilder
+      .speak(speechText)test('Expect index.js to exist', () => {
+
+})
+;
+      .withSimpleCard('Htest('Expect index.js to exist', () => {
+
+})
+;llo World', speechText)
       .getResponse();
   },
 };
 
-const SessionEndedRequestHandler = {
-  canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
+const SessionEndedRequestest('Expect index.js to exist', () => {
+
+})
+;Handler = {
+  canHandle(handlerInputtest('Expect index.js to exist', () => {
+
+})
+; {
+    return handlerInput.test('Expect index.js to exist', () => {
+
+})
+;equestEnvelope.request.type === 'SessionEndedRequest';
   },
-  handle(handlerInput) {
+  handle(handlerInput) {test('Expect index.js to exist', () => {
+
+})
+;
     // any cleanup logic goes here
     return handlerInput.responseBuilder.getResponse();
   },
@@ -85,8 +112,7 @@ const ErrorHandler = {
       .getResponse();
   },
 };
- console.log('we did it');
- 
+
 exports.handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
