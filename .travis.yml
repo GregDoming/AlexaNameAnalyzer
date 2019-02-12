@@ -13,3 +13,4 @@ deploy:
   runtime: nodejs8.10
   handler_name: handler
   zip: deployment/lambda_zip/nameAnalyzer.zip
+script: rm deployment/lambda_zip/nameAnalyzer.zip

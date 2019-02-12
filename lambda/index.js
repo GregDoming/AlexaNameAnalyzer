@@ -5,7 +5,7 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speechText = 'Welcome to Alexa Skills Kit, you can say hello!';
+    const speechText = 'Welcome to Name Analyzer. I can give you some insight into your name...What is your first name?';
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -14,6 +14,12 @@ const LaunchRequestHandler = {
       .getResponse();
   },
 };
+const genderNameIntentHandler = {
+  canFulfill(handlerInput) {
+    return handlerInput.requestEnvelope.request.intent.name === 'AMAZON.DE_FIRST_NAME'
+  }
+
+}
 
 const HelloWorldIntentHandler = {
   canHandle(handlerInput) {

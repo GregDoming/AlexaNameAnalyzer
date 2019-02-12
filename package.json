@@ -4,7 +4,8 @@
   "description": "Alexa First Name Analyzer",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "update": "node deployment/scripts/lambda_deploy.js && aws lambda update-function-code --function-name nameAnalyzer --zip-file fileb://deployment/lambda_zip/nameAnalyzer.zip"
   },
   "repository": {
     "type": "git",
