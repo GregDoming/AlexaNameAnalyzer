@@ -5,31 +5,54 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speechText = 'Welcome to Name Analyzer. I can give you some insight into your name...What is your first name?';
+    const speechText = 'Welcome to Name Analyzer. Here is some insight into your name...your first name?';
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .reprompt(speechText)
-      .withSimpleCard('Hello World', speechText)
+      .withSimpleCard(speechText)
       .getResponse();
   },
 };
+
+
 const NameIntentHandler = {
   canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.intent.name === 'AMAZON.DE_FIRST_NAME'
-      && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameIntent'
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameIntent';
   },
+
   handle(handlerInput) {
     const slots = handlerInput.requestEnvelope.request.intent.slots;
     const userName = slots['name'].value;
-    const speechText = `Your name is: ${userName}`
+    const speechText = `Your name is: ${userName}`;
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .withSimpleCard('Your name is', userName)
       .getResponse();
   },
-}
+};
+
+
+const GenderIntentHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'UserGenderIntent';
+
+  },
+  handle(handlerInput) {
+    const slots = handlerInput.requestEnvelope.request.intent.slots;
+    const gender = slots['gender'].value;
+    const speechText = `You are a ${gender}`;
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .withSimpleCard('You are a', gender)
+      .getResponse();
+  },
+};
+
 
 const HelpIntentHandler = {
   canHandle(handlerInput) {
@@ -47,6 +70,7 @@ const HelpIntentHandler = {
   },
 };
 
+
 const CancelAndStopIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -63,6 +87,7 @@ const CancelAndStopIntentHandler = {
   },
 };
 
+
 const SessionEndedRequestHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
@@ -72,6 +97,7 @@ const SessionEndedRequestHandler = {
     return handlerInput.responseBuilder.getResponse();
   },
 };
+
 
 const ErrorHandler = {
   canHandle() {
@@ -86,10 +112,12 @@ const ErrorHandler = {
       .getResponse();
   },
 };
+
 exports.handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
-    HelloWorldIntentHandler,
+    GenderIntentHandler,
+    NameIntentHandler,
     HelpIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler)
