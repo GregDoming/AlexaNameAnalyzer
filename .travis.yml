@@ -3,6 +3,8 @@ node_js:
 - node
 deploy:
   provider: lambda
+  access_key_id: "${AWS_ACCESS_KEY}"
+  secret_access_key: "${AWS_SECRET_KEY}"
   function_name: "nameAnalyzer"
   region: "us-west-2"
   role: "arn:aws:iam::822617710188:user/Administrator"
