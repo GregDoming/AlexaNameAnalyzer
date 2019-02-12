@@ -3,10 +3,10 @@ node_js:
   - node
 branches:
   only: master
-# deploy:
-#   provider: lambda
-#   function_name: "lambda-test"
-#   region: "us-west-2"
-#   role: "arn:aws:iam::0123456789012:role/lambda_basic_execution"
-#   runtime: "nodejs8.10"
-#   handler_name: "nameAnalyzer"
+deploy:
+  provider: lambda
+  function_name: "lambda-test"
+  region: "us-west-2"
+  role: "arn:aws:iam::0123456789012:role/lambda_basic_execution"
+  runtime: "nodejs8.10"
+  handler_name: "nameAnalyzer"
