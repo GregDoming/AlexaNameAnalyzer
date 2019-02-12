@@ -1,0 +1,10 @@
+{
+  "name": "alexanameanalyzer",
+  "version": "1.0.0",
+  "description": "Alexa First Name Analyzer",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "^2.401.0",
+    "dotenv": "^6.2.0"
+  }
+}
