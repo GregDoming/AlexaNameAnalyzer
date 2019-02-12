@@ -5,12 +5,11 @@ branches:
   only: master
 deploy:
   provider: lambda
-  function_name: lambda-test
-  region: us-west-2
-  role: arn:aws:iam::822617710188:user/Administrator
-  runtime: nodejs8.10
-  handler_name: nameAnalyzer
-  secret_access_key:
-    secure: VSfb08uQFA9G64rafVDXeW4PUg0N98sxaRHxjXFq2Vd0lf+rO8P9K64+YCrgiSkhs4YGWb4oYLRuWwpmisXbSo+1BtYjbLsNn1KSzcNa2Yz0Q4BD7TR1jSjxVZQdVchWfkALxtrZB9AcvWhliaFgoHtvfTbmVWXenL6jx1rPZps66f9Ckq2iasAvG+5aIcoyzEixOD6icyHlHW9xcGhiAzqUeACacGMIXmTuPRH3KKT1tiT27jga/O+3FWVj7Sg3tiXjtHo1SwX8+DhB0oUCUUwpIEuMVf1CttdWjAZR8koUDPWzga7iK0fYCjZXeMXGOTo9ZCVJV2ndpZIx0GM/WK7sl0sOZLPgxaw1Ubs0R4ry8+3rUCQnTy95DffhJkQipYO1xvHzrWJR9bWmlxFqbfzLLeifrl7nKu18eb58+XooL0DpPFdNQXwh3FdtEJldBtLdMVbwl8oyq10lMEHSW64WN7njZPBthsf7qSmNnB9ZHovgO0bwQmBvKvE0K30BWk4l3PSd9jpogcMDId2dLI4RbT0W5P3x6WrpRUgFz/FAeLIqluYWUrmWTQ8aG/82gcvLnrtV506ExVBDpuPwEjffs5yOjxbunAe/qS7C8VmvriAPAwFheHYVK8OKpxCL585Nw25zVsvUOoldAZsuEtmFEpZFf3fFiHua7I4X3s4=
-  access_key_id:
-    secure: sQFDb6GqCjcjDUMZVlR1MAw2zQ3Dz2pHvKG5QMZJeCO/uNEJ+AaCe2wdwRXiPIbHDvFqaCux/D5IujeJzeSsgREB24iwhYq2bOrWc/x111Av+g4XmXJ5+Yx/KheIFi1CtBQ9pTuCcGwDwTQH4+v6scOr8Y6iZAiPEWIeRH2pucH2MgRW6wFxEkp+A0Cmz/qnHKOPYzsac89vxcAnKVGhcNQ1sKsuCyjHNlLoAhgGnLxt/CPZsZ3D0DVi4kUJMxXFeTRXu5A56McX+j1PUz8QeJUYPN2fw3p4pP+3klzCRNN/16VPbJIzd2Aoin5R1M8XU54KVM6InE4aLypmLB9stHrrzDgJxZQlS/okzzaR8idEIbE43X0chMKSjpOCfwA4PbeEGkvqk9s5LmXD01Q/s004GR7QjlX1U3ZXGy9SzOTdTIY/JYNHyd5x5a/FSv5279WcbVg0FORJvYJhqJfWwmNYMOTNGEHK5QBxiCeYmLHGtrqXCMDvUpfMIYu9VpTcwmRtHPOiV2hlIBp3Bjm1kIr9DPzhrRyYo3xHW54ztUh/029hgyj8FDhsnjdytG3bLUszgVQ/v/t0sZORHzDg0dl24MSve0mY2zwo8aM3DgZfSiWbrFNNhH5lEi7Hr6qEwLQjlfdv2z4LEZzY8cEK6kflYgIqAM417GTjWAkvLFQ=
+  function_name: "lambda-test"
+  region: "us-west-2"
+  role: "arn:aws:iam::822617710188:user/Administrator"
+  runtime: "nodejs8.10"
+  handler_name: "nameAnalyzer"
+  secret_access_key: "AKIAITCQW67AHBW4INIA"
+  access_key_id: "XF9HDBgY+G3epuDHVAGt5QNSEpNUeSKRa5b9wpdh"
+    
