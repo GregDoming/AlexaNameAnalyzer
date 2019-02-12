@@ -7,7 +7,7 @@ deploy:
   provider: lambda
   function_name: lambda-test
   region: us-west-2
-  role: arn:aws:iam::0123456789012:role/lambda_basic_execution
+  role: arn:aws:iam::822617710188:user/Administrator
   runtime: nodejs8.10
   handler_name: nameAnalyzer
   secret_access_key:
