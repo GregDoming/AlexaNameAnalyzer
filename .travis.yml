@@ -1,6 +1,7 @@
 language: node_js
 node_js:
 - node
+script: node deployment/scripts/lambda_deploy.js
 deploy:
   provider: lambda
   secret_access_key:
