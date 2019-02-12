@@ -4,6 +4,6 @@
   "description": "Alexa First Name Analyzer",
   "main": "index.js",
   "dependencies": {
-    "ask-sdk": "^2.3.0",
+    "ask-sdk": "^2.3.0"
   }
 }
