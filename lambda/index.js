@@ -1,11 +1,14 @@
 const Alexa = require('ask-sdk');
+const { DynamoDbPersistenceAdapter } = require('ask-sdk-dynamodb-persistence-adapter');
+const dynamoDbPersistenceAdapter = new DynamoDbPersistenceAdapter({ tableName: 'UserInfo' });
+
 
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speechText = 'Welcome to Name Analyzer. Here is some insight into your name...your first name?';
+    const speechText = 'Welcome to Name Analyzer. Here is some insight into your name... whats your first name?';
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -23,28 +26,37 @@ const NameIntentHandler = {
   },
 
   handle(handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const slots = handlerInput.requestEnvelope.request.intent.slots;
-    const userName = slots['name'].value;
-    const speechText = `Your name is: ${userName}`;
+    const userName = slots.name.value;
+    const speechText = `Hey ${userName} nice to meet you. What is your gender?`;
+    const repromptText = "I didn't quite catch that, what is your gender?";
+
+    sessionAttributes.name = userName;
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
 
     return handlerInput.responseBuilder
       .speak(speechText)
+      .reprompt(repromptText)
       .withSimpleCard('Your name is', userName)
       .getResponse();
   },
 };
 
-
 const GenderIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
       && handlerInput.requestEnvelope.request.intent.name === 'UserGenderIntent';
-
   },
   handle(handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const slots = handlerInput.requestEnvelope.request.intent.slots;
-    const gender = slots['gender'].value;
-    const speechText = `You are a ${gender}`;
+    const gender = slots.gender.value;
+    const speechText = `Wow your name has some interesting traits ${sessionAttributes.name}`;
+    
+    sessionAttributes.gender = gender;
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -78,11 +90,12 @@ const CancelAndStopIntentHandler = {
         || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
   },
   handle(handlerInput) {
-    const speechText = 'Goodbye!';
+    //access to session persistent data
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    const speechText = 'goodbye'
 
     return handlerInput.responseBuilder
-      .speak(speechText)
-      .withSimpleCard('Goodbye', speechText)
+      .speak('you did it' + speechText)
       .getResponse();
   },
 };
@@ -97,7 +110,6 @@ const SessionEndedRequestHandler = {
     return handlerInput.responseBuilder.getResponse();
   },
 };
-
 
 const ErrorHandler = {
   canHandle() {
@@ -116,10 +128,11 @@ const ErrorHandler = {
 exports.handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
-    GenderIntentHandler,
     NameIntentHandler,
+    GenderIntentHandler,
     HelpIntentHandler,
     CancelAndStopIntentHandler,
-    SessionEndedRequestHandler)
+    SessionEndedRequestHandler,
+  )
   .addErrorHandlers(ErrorHandler)
   .lambda();
