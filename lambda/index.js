@@ -49,15 +49,20 @@ const GenderIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
       && handlerInput.requestEnvelope.request.intent.name === 'UserGenderIntent';
+      
   },
-  handle(handlerInput) {
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+  async handle(handlerInput) {
+    const attributesManager = handlerInput.attributesManager;
+    const sessionAttributes = attributesManager.sessionAttributes;
     const slots = handlerInput.requestEnvelope.request.intent.slots;
     const gender = slots.gender.value;
     const speechText = `Wow your name has some interesting traits ${sessionAttributes.name}`;
     
     sessionAttributes.gender = gender;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+    const userExists = await ddb.checkUserExists('gregs', 'male');
+    if (userExists) 
 
     return handlerInput.responseBuilder
       .speak(speechText)

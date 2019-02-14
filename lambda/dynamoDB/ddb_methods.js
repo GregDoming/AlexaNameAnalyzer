@@ -51,9 +51,34 @@ const checkUserExists = async (name, gender) => {
   }
 };
 
+const getDescription = async (name, gender) => {
+  AWS.config.update({
+    region: 'us-west-2',
+  });
 
-checkUserExists().then((res) => console.log(res))
+  const docClient = new AWS.DynamoDB.DocumentClient();
+
+  const params = {
+    TableName: 'USER_LIST',
+    Key: {
+      USER_FIRST_NAME: name,
+      GENDER: gender,
+    },
+  };
+
+  try {
+    const data = await docClient.get(params).promise();
+      console.log(data.Item.NAME_DESCRIPTION)
+  } catch (error) {
+    return {
+      statusCode: 400,
+      error: `Could not connect to db ${error.stack}`,
+    };
+  }
+};
 
 module.exports = {
   addTable,
+  checkUserExists,
+  getDescription,
 };
