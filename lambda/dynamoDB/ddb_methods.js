@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 
-const addTable = (name, gender, description) => {
+const addUser = (name, gender, description) => {
   AWS.config.update({
     region: 'us-west-2',
   });
@@ -19,7 +19,7 @@ const addTable = (name, gender, description) => {
     if (err) {
       console.error('Unable to add user. Error JSON:', JSON.stringify(err, null, 2));
     } else {
-      console.log('User added:', JSON.stringify(data, null, 2));
+      console.log(data);
     }
   });
 };
@@ -78,7 +78,7 @@ const getDescription = async (name, gender) => {
 };
 
 module.exports = {
-  addTable,
+  addUser,
   checkUserExists,
   getDescription,
 };

@@ -1,6 +1,6 @@
 const Alexa = require('ask-sdk');
 const { DynamoDbPersistenceAdapter } = require('ask-sdk-dynamodb-persistence-adapter');
-const getNameDescription = require('./scraper/paragraphGenerator.js');
+const scrape = require('./scraper/paragraphGenerator.js');
 const ddb = require('./dynamoDB/ddb_methods.js');
 
 const dynamoDbPersistenceAdapter = new DynamoDbPersistenceAdapter({ tableName: 'USER_LIST' });
@@ -37,7 +37,6 @@ const NameIntentHandler = {
     sessionAttributes.name = userName;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
-
     return handlerInput.responseBuilder
       .speak(speechText)
       .reprompt(repromptText)
@@ -46,23 +45,34 @@ const NameIntentHandler = {
   },
 };
 
+
 const GenderIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
       && handlerInput.requestEnvelope.request.intent.name === 'UserGenderIntent';
   },
+
   async handle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const slots = handlerInput.requestEnvelope.request.intent.slots;
     const gender = slots.gender.value;
     const userName = sessionAttributes.name;
-    const speechText = "what the help";
 
     sessionAttributes.gender = gender;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
-    // const userExists = await ddb.checkUserExists(userName, gender);
-    // if (userExists) speechText = await ddb.getDescription(userName, gender);
+    if (await ddb.checkUserExists(userName, gender)) {
+      const speechText = await ddb.getDescription(userName, gender);
+
+      return handlerInput.responseBuilder
+        .speak(speechText)
+        .withSimpleCard('You are a', gender)
+        .getResponse();
+    }
+
+    const description = await scrape.getNameDescription(userName, gender);
+    await ddb.addUser(userName, gender, description);
+    const speechText = await ddb.getDescription(userName, gender);
 
     return handlerInput.responseBuilder
       .speak(speechText)

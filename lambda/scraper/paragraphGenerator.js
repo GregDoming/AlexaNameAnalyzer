@@ -3,12 +3,13 @@ const cheerio = require('cheerio');
 
 
 const getNameDescription = async (name, gender) => {
-  const url = await rp('https://www.kabalarians.com/name-meanings/names/female/Soraya.htm');
+  const url = await rp(`https://www.kabalarians.com/name-meanings/names/${gender}/${name}.htm`);
   const $ = cheerio.load(url);
-  const nameDescription = $('#headerOL').contents().slice(3, 4).map(() => $(this).text().trim())
-    .get();
+  const nameDescription = $('#headerOL').contents().slice(3, 4).text()
 
-  nthIndex(nameDescription[0], '.', 4);
+  const result = nthIndex(nameDescription, '.', 4);
+
+  return result;
 };
 
 const nthIndex = (str, pat, n) => {
@@ -29,6 +30,8 @@ const nthIndex = (str, pat, n) => {
   return finalDescription.concat('.');
 };
 
+getNameDescription('Greg', 'male');
 module.exports = {
   getNameDescription,
-}
+  nthIndex,
+};
