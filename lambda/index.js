@@ -1,7 +1,8 @@
 const Alexa = require('ask-sdk');
 const { DynamoDbPersistenceAdapter } = require('ask-sdk-dynamodb-persistence-adapter');
-const dynamoDbPersistenceAdapter = new DynamoDbPersistenceAdapter({ tableName: 'UserInfo' });
-
+const getNameDescription = require('./scraper/paragraphGenerator.js');
+const ddb = require('./dynamoDB/ddb_methods.js');
+const dynamoDbPersistenceAdapter = new DynamoDbPersistenceAdapter({ tableName: 'USER_LIST' });
 
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
@@ -134,5 +135,6 @@ exports.handler = Alexa.SkillBuilders.custom()
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler,
   )
+  .withPersistenceAdapter(dynamoDbPersistenceAdapter)
   .addErrorHandlers(ErrorHandler)
   .lambda();

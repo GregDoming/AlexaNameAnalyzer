@@ -22,8 +22,11 @@
     "ask-sdk-dynamodb-persistence-adapter": "^2.3.0",
     "ask-sdk-model": "^1.11.2",
     "aws-sdk": "^2.401.0",
+    "cheerio": "^1.0.0-rc.2",
     "child_process": "^1.0.2",
-    "dotenv": "^6.2.0"
+    "dotenv": "^6.2.0",
+    "request-promise": "^4.2.2",
+    "rp": "^0.2.0"
   },
   "devDependencies": {
     "adm-zip": "^0.4.13",
