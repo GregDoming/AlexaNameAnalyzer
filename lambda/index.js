@@ -1,5 +1,4 @@
 const Alexa = require('ask-sdk');
-const AWS = require('aws-sdk');
 const scrape = require('./scraper/paragraphGenerator.js');
 const ddb = require('./dynamoDB/ddb_methods.js');
 
@@ -13,10 +12,25 @@ const LaunchRequestHandler = {
     return handlerInput.responseBuilder
       .speak(speechText)
       .reprompt(speechText)
-      .withSimpleCard(speechText)
       .getResponse();
   },
 };
+
+// const InProgressNameGenderIntentHandler = {
+//   canHandle(handlerInput) {
+//     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+//       && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameGenderIntent'
+//       && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED';
+
+//   },
+//   handle(handlerInput) {
+//     const currentIntent = handlerInput.requestEnvelope.request.intent;
+    
+//     return handlerInput.responseBuilder
+//       .addDelegateDirective(currentIntent)
+//       .getResponse();
+//   },
+// };
 
 
 const NameIntentHandler = {
@@ -29,15 +43,12 @@ const NameIntentHandler = {
     const slots = handlerInput.requestEnvelope.request.intent.slots;
     const userName = slots.name.value;
     const speechText = `Hey ${userName} nice to meet you. What is your gender?`;
-    const repromptText = "I didn't quite catch that, what is your gender?";
 
     sessionAttributes.name = userName;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt(repromptText)
-      .withSimpleCard('Your name is', userName)
       .getResponse();
   },
 };
@@ -58,11 +69,10 @@ const GenderIntentHandler = {
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
     if (await ddb.checkUserExists(userName, gender)) {
-      const speechText = await ddb.getDescription(userName, gender);
+      const speechText = `${await ddb.getDescription(userName, gender) }   Would you like to hear about another name?`;
 
       return handlerInput.responseBuilder
         .speak(speechText)
-        .withSimpleCard('You are a', gender)
         .getResponse();
     }
 
@@ -79,16 +89,15 @@ const GenderIntentHandler = {
 
 const StartOverIntentHandler = {
   canHandle(handlerInput) {
-    return handlerinput.requestEnvelope.request.type === 'IntentRequest'
-      && (handlerInput.requestEnvelope.request.type === 'AMAZON.YesIntent'
-        || handlerInput.requestEnvelope.request.type === 'AMAZON.NoIntent');
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && (handlerInput.requestEnvelope.intent.name === 'AMAZON.YesIntent'
+        || handlerInput.requestEnvelope.intent.name === 'AMAZON.NoIntent');
   },
   handle(handlerInput) {
     const speechText = 'Would you like to learn about another name?';
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt(speechText)
       .getResponse();
   },
 };
@@ -100,12 +109,30 @@ const HelpIntentHandler = {
       && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';
   },
   handle(handlerInput) {
-    const speechText = 'You can say hello to me!';
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    if (sessionAttributes.gender) {
+      const speechText = 'Sure! If you want to continue give me your name and I can give you the meaning behind it';
+      return handlerInput.responseBuilder
+        .speak(speechText)
+        .getResponse();
+    }
+    const speechText = 'Sure! If you want to continue give me your gender and I can give you the meaning behind it';
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .getResponse();
+  },
+};
+
+const FallBackIntentHandler = {
+  canhandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handler.requestEnvelope.request.intent.name === 'AMAZON.fallbackIntent';
+  },
+  handle(handlerInput) {
+    const speechText = 'I did understand what you said could you repeat?';
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt(speechText)
-      .withSimpleCard('Hello World', speechText)
       .getResponse();
   },
 };
@@ -114,16 +141,13 @@ const HelpIntentHandler = {
 const CancelAndStopIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent'
-        || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
+      && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent';
   },
   handle(handlerInput) {
-    // access to session persistent data
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    const speechText = 'goodbye';
+    const speechText = 'yes?';
 
     return handlerInput.responseBuilder
-      .speak('Dont be lame come back tomorrow and find out about more names')
+      .speak(speechText)
       .getResponse();
   },
 };
@@ -158,8 +182,9 @@ exports.handler = Alexa.SkillBuilders.custom()
     LaunchRequestHandler,
     NameIntentHandler,
     GenderIntentHandler,
-    StartOverIntentHandler,
+    FallBackIntentHandler,
     HelpIntentHandler,
+    StartOverIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler,
   )

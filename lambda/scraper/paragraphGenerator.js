@@ -26,7 +26,6 @@ const nthIndex = (str, pat, n) => {
   return finalDescription.concat('.');
 };
 
-getNameDescription('Greg', 'male');
 module.exports = {
   getNameDescription,
   nthIndex,
