@@ -1,16 +1,14 @@
 const Alexa = require('ask-sdk');
-const { DynamoDbPersistenceAdapter } = require('ask-sdk-dynamodb-persistence-adapter');
+const AWS = require('aws-sdk');
 const scrape = require('./scraper/paragraphGenerator.js');
 const ddb = require('./dynamoDB/ddb_methods.js');
-
-const dynamoDbPersistenceAdapter = new DynamoDbPersistenceAdapter({ tableName: 'USER_LIST' });
 
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speechText = 'Welcome to Name Analyzer. Here is some insight into your name... whats your first name?';
+    const speechText = 'Welcome to Name Analyzer. I have some insight into your name... whats your first name?';
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -26,7 +24,6 @@ const NameIntentHandler = {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
       && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameIntent';
   },
-
   handle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const slots = handlerInput.requestEnvelope.request.intent.slots;
@@ -51,7 +48,6 @@ const GenderIntentHandler = {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
       && handlerInput.requestEnvelope.request.intent.name === 'UserGenderIntent';
   },
-
   async handle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const slots = handlerInput.requestEnvelope.request.intent.slots;
@@ -77,6 +73,22 @@ const GenderIntentHandler = {
     return handlerInput.responseBuilder
       .speak(speechText)
       .withSimpleCard('You are a', gender)
+      .getResponse();
+  },
+};
+
+const StartOverIntentHandler = {
+  canHandle(handlerInput) {
+    return handlerinput.requestEnvelope.request.type === 'IntentRequest'
+      && (handlerInput.requestEnvelope.request.type === 'AMAZON.YesIntent'
+        || handlerInput.requestEnvelope.request.type === 'AMAZON.NoIntent');
+  },
+  handle(handlerInput) {
+    const speechText = 'Would you like to learn about another name?';
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .reprompt(speechText)
       .getResponse();
   },
 };
@@ -111,7 +123,7 @@ const CancelAndStopIntentHandler = {
     const speechText = 'goodbye';
 
     return handlerInput.responseBuilder
-      .speak(`you did it${speechText}`)
+      .speak('Dont be lame come back tomorrow and find out about more names')
       .getResponse();
   },
 };
@@ -146,10 +158,10 @@ exports.handler = Alexa.SkillBuilders.custom()
     LaunchRequestHandler,
     NameIntentHandler,
     GenderIntentHandler,
+    StartOverIntentHandler,
     HelpIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler,
   )
-  .withPersistenceAdapter(dynamoDbPersistenceAdapter)
   .addErrorHandlers(ErrorHandler)
   .lambda();
