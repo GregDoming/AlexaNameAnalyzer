@@ -68,7 +68,7 @@ const getDescription = async (name, gender) => {
 
   try {
     const data = await docClient.get(params).promise();
-      console.log(data.Item.NAME_DESCRIPTION)
+    return data.Item.NAME_DESCRIPTION;
   } catch (error) {
     return {
       statusCode: 400,

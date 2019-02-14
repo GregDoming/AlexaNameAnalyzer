@@ -2,6 +2,7 @@ const Alexa = require('ask-sdk');
 const { DynamoDbPersistenceAdapter } = require('ask-sdk-dynamodb-persistence-adapter');
 const getNameDescription = require('./scraper/paragraphGenerator.js');
 const ddb = require('./dynamoDB/ddb_methods.js');
+
 const dynamoDbPersistenceAdapter = new DynamoDbPersistenceAdapter({ tableName: 'USER_LIST' });
 
 const LaunchRequestHandler = {
@@ -49,20 +50,19 @@ const GenderIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
       && handlerInput.requestEnvelope.request.intent.name === 'UserGenderIntent';
-      
   },
   async handle(handlerInput) {
-    const attributesManager = handlerInput.attributesManager;
-    const sessionAttributes = attributesManager.sessionAttributes;
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const slots = handlerInput.requestEnvelope.request.intent.slots;
     const gender = slots.gender.value;
-    const speechText = `Wow your name has some interesting traits ${sessionAttributes.name}`;
-    
+    const userName = sessionAttributes.name;
+    const speechText = "what the help";
+
     sessionAttributes.gender = gender;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
-    const userExists = await ddb.checkUserExists('gregs', 'male');
-    if (userExists) 
+    // const userExists = await ddb.checkUserExists(userName, gender);
+    // if (userExists) speechText = await ddb.getDescription(userName, gender);
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -96,12 +96,12 @@ const CancelAndStopIntentHandler = {
         || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
   },
   handle(handlerInput) {
-    //access to session persistent data
+    // access to session persistent data
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    const speechText = 'goodbye'
+    const speechText = 'goodbye';
 
     return handlerInput.responseBuilder
-      .speak('you did it' + speechText)
+      .speak(`you did it${speechText}`)
       .getResponse();
   },
 };
