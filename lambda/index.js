@@ -7,7 +7,8 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speechText = 'Welcome to Name Analyzer. I have some insight into your name... whats your first name?';
+    console.log('no here')
+    const speechText = 'Welcome to Name Analyzer. I have some insight into your name... whats your first name and your gender?';
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -16,76 +17,88 @@ const LaunchRequestHandler = {
   },
 };
 
-// const InProgressNameGenderIntentHandler = {
+const InProgressGetNameGenderIntentHandler = {
+  canHandle(handlerInput) {
+    console.log(handlerInput.requestEnvelope.request.intent.name)
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameGenderIntent'
+      && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED';
+  },
+  handle(handlerInput) {
+    // const userName = handlerInput.request.intent.slots.userName.value;
+    // const gender = handlerInput.request.intent.slots.gender.value;
+
+    // const speechText = `hi ${userName}`
+    const speechText = 'hi'
+
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .getResponse();
+  },
+};
+
+
+// const CompletedGetNameGenderIntentHandler = {
+//   canHandle(handlerInput) {
+
+//   }
+// }
+
+
+// const NameIntentHandler = {
 //   canHandle(handlerInput) {
 //     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-//       && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameGenderIntent'
-//       && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED';
-
+//       && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameIntent';
 //   },
 //   handle(handlerInput) {
-//     const currentIntent = handlerInput.requestEnvelope.request.intent;
-    
+//     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+//     const slots = handlerInput.requestEnvelope.request.intent.slots;
+//     const userName = slots.name.value;
+//     const speechText = `Hey ${userName} nice to meet you. What is your gender?`;
+
+//     sessionAttributes.name = userName;
+//     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
 //     return handlerInput.responseBuilder
-//       .addDelegateDirective(currentIntent)
+//       .speak(speechText)
 //       .getResponse();
 //   },
 // };
 
 
-const NameIntentHandler = {
-  canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameIntent';
-  },
-  handle(handlerInput) {
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    const slots = handlerInput.requestEnvelope.request.intent.slots;
-    const userName = slots.name.value;
-    const speechText = `Hey ${userName} nice to meet you. What is your gender?`;
+// const GenderIntentHandler = {
+//   canHandle(handlerInput) {
+//     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+//       && handlerInput.requestEnvelope.request.intent.name === 'UserGenderIntent';
+//   },
+  // async handle(handlerInput) {
+// const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+// const slots = handlerInput.requestEnvelope.request.intent.slots;
+// const gender = slots.gender.value;
+// const userName = sessionAttributes.name;
 
-    sessionAttributes.name = userName;
-    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+// sessionAttributes.gender = gender;
+// handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
-    return handlerInput.responseBuilder
-      .speak(speechText)
-      .getResponse();
-  },
-};
+// if (await ddb.checkUserExists(userName, gender)) {
+//   const speechText = `${await ddb.getDescription(userName, gender) }   Would you like to hear about another name?`;
 
+//   return handlerInput.responseBuilder
+//     .speak(speechText)
+//     .getResponse();
+// }
 
-const GenderIntentHandler = {
-  canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && handlerInput.requestEnvelope.request.intent.name === 'UserGenderIntent';
-  },
-  async handle(handlerInput) {
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    const slots = handlerInput.requestEnvelope.request.intent.slots;
-    const gender = slots.gender.value;
-    const userName = sessionAttributes.name;
+// const description = await scrape.getNameDescription(userName, gender);
+// await ddb.addUser(userName, gender, description);
+// const speechText = await ddb.getDescription(userName, gender);
 
-    sessionAttributes.gender = gender;
-    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-
-    if (await ddb.checkUserExists(userName, gender)) {
-      const speechText = `${await ddb.getDescription(userName, gender) }   Would you like to hear about another name?`;
-
-      return handlerInput.responseBuilder
-        .speak(speechText)
-        .getResponse();
-    }
-
-    const description = await scrape.getNameDescription(userName, gender);
-    await ddb.addUser(userName, gender, description);
-    const speechText = await ddb.getDescription(userName, gender);
-
-    return handlerInput.responseBuilder
-      .speak(speechText)
-      .withSimpleCard('You are a', gender)
-      .getResponse();
-  },
-};
+// return handlerInput.responseBuilder
+//   .speak(speechText)
+//   .withSimpleCard('You are a', gender)
+//   .getResponse();
+  // },
+// };
 
 const StartOverIntentHandler = {
   canHandle(handlerInput) {
@@ -122,21 +135,6 @@ const HelpIntentHandler = {
       .getResponse();
   },
 };
-
-const FallBackIntentHandler = {
-  canhandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && handler.requestEnvelope.request.intent.name === 'AMAZON.fallbackIntent';
-  },
-  handle(handlerInput) {
-    const speechText = 'I did understand what you said could you repeat?';
-
-    return handlerInput.responseBuilder
-      .speak(speechText)
-      .getResponse();
-  },
-};
-
 
 const CancelAndStopIntentHandler = {
   canHandle(handlerInput) {
@@ -180,9 +178,7 @@ const ErrorHandler = {
 exports.handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
-    NameIntentHandler,
-    GenderIntentHandler,
-    FallBackIntentHandler,
+    InProgressGetNameGenderIntentHandler,
     HelpIntentHandler,
     StartOverIntentHandler,
     CancelAndStopIntentHandler,

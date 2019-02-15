@@ -90,38 +90,17 @@
                         {
                             "name": "name",
                             "type": "AMAZON.US_FIRST_NAME"
-                        },
-                        {
-                            "name": "ukName",
-                            "type": "AMAZON.GB_FIRST_NAME"
-                        },
-                        {
-                            "name": "germanName",
-                            "type": "AMAZON.DE_FIRST_NAME"
                         }
                     ],
                     "samples": [
+                        "{name}",
                         "some call me {name}",
                         "{name} is what they call me",
                         "{name} is my name",
                         "my first name is {name}",
                         "they call me {name}",
                         "I am {name}",
-                        "my name is {name}",
-                        "some call me {ukName}",
-                        "{ukName} is what they call me",
-                        "{ukName} is my name",
-                        "my first name is {ukName}",
-                        "they call me {ukName}",
-                        "I am {ukName}",
-                        "my name is {ukName}",
-                        "some call me {germanName}",
-                        "{germanName} is what they call me",
-                        "{germanName} is my name",
-                        "my first name is {germanName}",
-                        "they call me {germanName}",
-                        "I am {germanName}",
-                        "my name is {germanName}"
+                        "my name is {name}"
                     ]
                 },
                 {
