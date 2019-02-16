@@ -29,9 +29,6 @@ const InProgressGetNameGenderIntentHandler = {
     // const gender = handlerInput.request.intent.slots.gender.value;
 
     // const speechText = `hi ${userName}`
-    const speechText = 'hi'
-
-
     return handlerInput.responseBuilder
       .speak(speechText)
       .getResponse();
