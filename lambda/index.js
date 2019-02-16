@@ -25,8 +25,10 @@ const InProgressGetNameGenderIntentHandler = {
       && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED';
   },
   handle(handlerInput) {
-    // const userName = handlerInput.requestEnvelope.request.intent.slots.userName.value;
-    // const gender = handlerInput.requestEnvelope.request.intent.slots.gender.value;
+    const userName = handlerInput.requestEnvelope.request.intent.slots.userName.value;
+    const gender = handlerInput.requestEnvelope.request.intent.slots.gender.value;
+    console.log(userName)
+    console.log(gender)
 
     return handlerInput.responseBuilder
       .addDelegateDirective()
