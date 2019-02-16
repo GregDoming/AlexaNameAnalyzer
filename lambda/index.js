@@ -25,10 +25,12 @@ const InProgressGetNameGenderIntentHandler = {
       && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED';
   },
   handle(handlerInput) {
-    // const userName = handlerInput.request.intent.slots.userName.value;
+    const userName = handlerInput.requestEnvelope.request.intent.slots.userName.value;
     // const gender = handlerInput.request.intent.slots.gender.value;
+    console.log('first')
 
-    // const speechText = `hi ${userName}`
+    const speechText = `hi ${userName}`
+    console.log('second')
     return handlerInput.responseBuilder
       .speak(speechText)
       .getResponse();
