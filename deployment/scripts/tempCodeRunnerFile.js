@@ -1,1 +1,1 @@
-nameAnalyzer
+const bufferedZip = zip.toBuffer();
