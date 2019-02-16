@@ -25,14 +25,11 @@ const InProgressGetNameGenderIntentHandler = {
       && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED';
   },
   handle(handlerInput) {
-    const userName = handlerInput.requestEnvelope.request.intent.slots.userName.value;
-    // const gender = handlerInput.request.intent.slots.gender.value;
-    console.log('first')
+    // const userName = handlerInput.requestEnvelope.request.intent.slots.userName.value;
+    // const gender = handlerInput.requestEnvelope.request.intent.slots.gender.value;
 
-    const speechText = `hi ${userName}`
-    console.log('second')
     return handlerInput.responseBuilder
-      .speak(speechText)
+      .addDelegateDirective()
       .getResponse();
   },
 };
