@@ -11,22 +11,22 @@ zip.addLocalFolder('lambda');
 
 zip.writeZip('deployment/lambda_zip/nameAnalyzer.zip');
 
-const bufferedZip = zip.toBuffer();
+// const bufferedZip = zip.toBuffer();
 
-const lambda = new AWS.Lambda({
-    region: 'us-west-2',
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_KEY,
-});
+// const lambda = new AWS.Lambda({
+//     region: 'us-west-2',
+//     accessKeyId: process.env.AWS_ACCESS_KEY,
+//     secretAccessKey: process.env.AWS_SECRET_KEY,
+// });
 
-const updateFunctionParams = {
-  FunctionName: 'nameAnalyzer', /* required */
-  DryRun: false,
-  Publish: false,
-  ZipFile: bufferedZip,
-};
+// const updateFunctionParams = {
+//   FunctionName: 'nameAnalyzer', /* required */
+//   DryRun: false,
+//   Publish: false,
+//   ZipFile: bufferedZip,
+// };
 
-lambda.updateFunctionCode(updateFunctionParams, (err, data) => {
-  if (err) console.log(err, err.stack); // an error occurred
-  else     console.log(data);           // successful response
-});
+// lambda.updateFunctionCode(updateFunctionParams, (err, data) => {
+//   if (err) console.log(err, err.stack); // an error occurred
+//   else     console.log(data);           // successful response
+// });

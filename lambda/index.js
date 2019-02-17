@@ -7,7 +7,6 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    console.log('no here')
     const speechText = 'Welcome to Name Analyzer. I have some insight into your name... whats your first name and your gender?';
 
     return handlerInput.responseBuilder
@@ -17,32 +16,129 @@ const LaunchRequestHandler = {
   },
 };
 
+
 const InProgressGetNameGenderIntentHandler = {
   canHandle(handlerInput) {
-    console.log(handlerInput.requestEnvelope.request.intent.name)
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
       && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameGenderIntent'
       && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED';
   },
   handle(handlerInput) {
-    const userName = handlerInput.requestEnvelope.request.intent.slots.userName.value;
-    const gender = handlerInput.requestEnvelope.request.intent.slots.gender.value;
-    console.log(userName)
-    console.log(gender)
-
     return handlerInput.responseBuilder
-      .addDelegateDirective()
       .getResponse();
   },
 };
 
+const CompletedGetNameGenderIntentHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+    && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameGenderIntent'
+    && handlerInput.requestEnvelope.request.dialogState === 'COMPLETED';
+  },
+  async handle(handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    const slots = handlerInput.requestEnvelope.request.intent.slots;
+    const userName = slots.userName.value;
+    const gender = slots.gender.value;
 
-// const CompletedGetNameGenderIntentHandler = {
+    sessionAttributes.userName = userName;
+    sessionAttributes.gender = gender;
+      
+    if (await ddb.checkUserExists(userName, gender)) {
+      const speechText = `${await ddb.getDescription(userName, gender)} Would you like to hear more?`;
+      sessionAttributes.description = await ddb.getDescription(userName, gender, 1);
+      
+      await handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+      return handlerInput.responseBuilder
+        .speak(speechText)
+        .getResponse();
+    }
+
+    const description = await scrape.getNameDescription(userName, gender);
+    await ddb.addUser(userName, gender, description);
+    let speechText = await ddb.getDescription(userName, gender, 1);
+
+    sessionAttributes.description = await ddb.getDescription(userName, gender, 1);
+
+    // sessionAttributes.sentenceNumber += 2;
+    await handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+    while (speechText === undefined) {
+      speechText = await ddb.getDescription(userName, gender, 1);
+    }
+
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .getResponse();
+  },
+};
+
+// const ContinueDescriptionIntentHandler ={
 //   canHandle(handlerInput) {
+//     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+//     && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent';
+
+//   },
+//   async handle(handlerInput) {
+//     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+//     const count = sessionAttributes.sentenceNumber;
+
+//     const speechText = await ddb.getDescription(userName, gender, count);
+
+//     return handlerInput.responseBuilder
+//     .speak(speechText)
+//     .getResponse();
+//   },
+// };
+// const CompletedGetNickNameGenderIntentHandler = {
+//   canHandle(handlerInput) {
+//     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+//     && handlerInput.requestEnvelope.request.intent.name === 'UserNickNameGenderIntent'
+//     && handlerInput.requestEnvelope.request.intent.slots.gender.value
+//     && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED';
+//   },
+//   async handle(handlerInput) {
+//     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+//     const slots = handlerInput.requestEnvelope.request.intent.slots;
+//     const userName = slots.userName.value;
+//     const gender = slots.gender.value;
+
+//     sessionAttributes.userName = userName;
+//     sessionAttributes.gender = gender;
+//     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+//     if (await ddb.checkUserExists(userName, gender)) {
+//       const speechText = `${await ddb.getDescription(userName, gender)}   Would you like to hear about another name?`;
+
+//       return handlerInput.responseBuilder
+//         .speak(speechText)
+//         .getResponse();
+//     }
+
+//     const description = await scrape.getNameDescription(userName, gender);
+//     await ddb.addUser(userName, gender, description);
+//     const speechText = await ddb.getDescription(userName, gender);
+
+//     return handlerInput.responseBuilder
+//       .speak(speechText)
+//       .addElicitSlotDirective
+//       .getResponse();
+//   },
+// };
+
+// const GetAnotherDescriptionIntent {
+//   canHandle(handlerInput) {
+//     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+//     && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED'
+//     && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent'
+//     || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.NoIntent')
+
+//   },
+//   handle(handlerInput) {
 
 //   }
 // }
-
 
 // const NameIntentHandler = {
 //   canHandle(handlerInput) {
@@ -50,13 +146,13 @@ const InProgressGetNameGenderIntentHandler = {
 //       && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameIntent';
 //   },
 //   handle(handlerInput) {
-//     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-//     const slots = handlerInput.requestEnvelope.request.intent.slots;
-//     const userName = slots.name.value;
-//     const speechText = `Hey ${userName} nice to meet you. What is your gender?`;
+// const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+// const slots = handlerInput.requestEnvelope.request.intent.slots;
+// const userName = slots.name.value;
+// const speechText = `Hey ${userName} nice to meet you. What is your gender?`;
 
-//     sessionAttributes.name = userName;
-//     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+// sessionAttributes.name = userName;
+// handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
 //     return handlerInput.responseBuilder
 //       .speak(speechText)
@@ -70,7 +166,7 @@ const InProgressGetNameGenderIntentHandler = {
 //     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
 //       && handlerInput.requestEnvelope.request.intent.name === 'UserGenderIntent';
 //   },
-  // async handle(handlerInput) {
+// async handle(handlerInput) {
 // const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 // const slots = handlerInput.requestEnvelope.request.intent.slots;
 // const gender = slots.gender.value;
@@ -95,23 +191,23 @@ const InProgressGetNameGenderIntentHandler = {
 //   .speak(speechText)
 //   .withSimpleCard('You are a', gender)
 //   .getResponse();
-  // },
+// },
 // };
 
-const StartOverIntentHandler = {
-  canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && (handlerInput.requestEnvelope.intent.name === 'AMAZON.YesIntent'
-        || handlerInput.requestEnvelope.intent.name === 'AMAZON.NoIntent');
-  },
-  handle(handlerInput) {
-    const speechText = 'Would you like to learn about another name?';
+// const InProgressStartOverIntentHandler = {
+//   canHandle(handlerInput) {
+//     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+//       && (handlerInput.requestEnvelope.intent.name === 'AMAZON.YesIntent'
+//         || handlerInput.requestEnvelope.intent.name === 'AMAZON.NoIntent');
+//   },
+//   handle(handlerInput) {
+//     const speechText = 'Would you like to learn about another name?';
 
-    return handlerInput.responseBuilder
-      .speak(speechText)
-      .getResponse();
-  },
-};
+//     return handlerInput.responseBuilder
+//       .speak(speechText)
+//       .getResponse();
+//   },
+// };
 
 
 const HelpIntentHandler = {
@@ -177,8 +273,9 @@ exports.handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
     InProgressGetNameGenderIntentHandler,
+    CompletedGetNameGenderIntentHandler,
     HelpIntentHandler,
-    StartOverIntentHandler,
+    // InProgressStartOverIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler,
   )

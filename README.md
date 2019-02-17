@@ -1,2 +1,5 @@
 # AlexaNameAnalyzer
 Alexa skill name analyzer
+
+
+You might be asking to yourself why are we checking if (!filledSlots) and returning null if its undefined immediately after we call delegateSlotCollection. In delegateSlotCollection we make an asynchronous call to this.emit(':delegate') when the dialogState is not COMPELETED, which will put the dialog delegation to Alexa onto the next runtime tick and continue executing delegateSlotCollection and once it returns GetLocationIntent will continue. Once GetLocationIntent finishes executing, the next runtime tick will occur and this.emit(':delegate') will execute. Since the delegation to Alexa for slot collection doesn't run until the next tick, filledSlots will be null, so we must stop GetLocationIntent from executing or else we will encounter errors.
