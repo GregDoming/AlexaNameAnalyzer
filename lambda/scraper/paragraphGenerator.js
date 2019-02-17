@@ -2,22 +2,29 @@ const rp = require('request-promise');
 const cheerio = require('cheerio');
 
 /**
- * Scrapes kabalarians.com for name analyzation.
- * @param {name} name some name
- * @param {gender} gender The second number to add.
- * @return {result} The first n (from the helper function nth index) sentences returned from webstie
+ * Scrapes kabalarians.com for name analyzation and returns a string.
+ * @param  {string} name The name to look up.
+ * @param {string} gender The gender to look up with the name. Male and female give different descriptions
+ * @param {number} n Grabs the first n sentences of the description.
  */
 
 
-const getNameDescription = async (name, gender) => {
+const getNameDescription = async (name, gender, n) => {
   const url = await rp(`https://www.kabalarians.com/name-meanings/names/${gender}/${name}.htm`);
   const cheer = cheerio.load(url);
   const nameDescription = cheer('#headerOL').contents().slice(3, 4).text();
 
-  const result = await nthIndex(nameDescription, '.', 4);
+  const result = await nthIndex(nameDescription, '.', n + 1);
 
   return result;
 };
+
+/**
+ * Helper function to return n sentences from the scraped website.
+ * @param {str} str some name
+ * @param {gender} gender The second number to add.
+ * @return {result} The first n (from the helper function nth index) sentences returned from webstie
+ */
 
 const nthIndex = async (str, pat, n) => {
   let index;
@@ -31,14 +38,6 @@ const nthIndex = async (str, pat, n) => {
   }
 
   return finalDescription.concat('.');
-
-  // for (let i = 1; i < n; i += 1) {
-  //   index = str.indexOf(pat, temp + 1);
-  //   finalDescription.push(str.slice(temp, index));
-  //   temp = index;
-  // }
-
-  // return finalDescription;
 };
 
 

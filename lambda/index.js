@@ -45,7 +45,7 @@ const CompletedGetNameGenderIntentHandler = {
     sessionAttributes.gender = gender;
       
     if (await ddb.checkUserExists(userName, gender)) {
-      const speechText = `${await ddb.getDescription(userName, gender)} Would you like to hear more?`;
+      const speechText = `${await ddb.getDescription(userName, gender, 1)} Would you like to hear more?`;
       sessionAttributes.description = await ddb.getDescription(userName, gender, 1);
       
       await handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
@@ -55,7 +55,7 @@ const CompletedGetNameGenderIntentHandler = {
         .getResponse();
     }
 
-    const description = await scrape.getNameDescription(userName, gender);
+    const description = await scrape.getNameDescription(userName, gender, 4);
     await ddb.addUser(userName, gender, description);
     let speechText = await ddb.getDescription(userName, gender, 1);
 

@@ -1,5 +1,12 @@
 const AWS = require('aws-sdk');
-const scraper = require('../scraper/paragraphGenerator.js');
+const scraper = require('../scraper/paragraphGenerator.js')
+
+/**
+ * Adds the name, gender, and description of a user to DynamoDB and returns a string (promise), it will not overwrite.
+ * @param {string} name Name of user to add.
+ * @param {string} gender Gender of user to add.
+ * @param {string} description Description of user to add.
+ */
 
 const addUser = async (name, gender, description) => {
   AWS.config.update({
@@ -25,6 +32,11 @@ const addUser = async (name, gender, description) => {
   });
 };
 
+/**
+ * Checks DynamoDB to see if the user exists and returns a boolean.
+ * @param {string} name Name of user to add.
+ * @param {string} gender Gender of user to add.
+ */
 
 const checkUserExists = async (name, gender) => {
   AWS.config.update({
@@ -51,6 +63,13 @@ const checkUserExists = async (name, gender) => {
     };
   }
 };
+
+/**
+ * Gets the first or second half of the corresponding user's description, returns a string.
+ * @param {string} name Name of user to look up.
+ * @param {string} gender Gender of user to look up.
+ * @param {number} sentenceNumber Accepts the number 1 (will return firt half of description) or 2 (will return the second half of the description)
+ */
 
 const getDescription = async (name, gender, sentenceNumber) => {
   AWS.config.update({
@@ -92,14 +111,13 @@ const getDescription = async (name, gender, sentenceNumber) => {
 };
 
 // const help = async () => {
-//   const scrape = await scraper.getNameDescription('Ted', 'male');
-//   await addUser('Ted', 'male', scrape);
-//   const final = await getDescription('Ted', 'male', 1);
+//   const scrape = await scraper.getNameDescription('Greg', 'male', 4);
+//   console.log(scrape)
+//   await addUser('Greg', 'male', scrape);
+//   const final = await getDescription('Greg', 'male', 1);
 //   return final;
 // };
-// console.log('look here');
-// help().then(data => console.log(data));
-
+// help()
 module.exports = {
   addUser,
   checkUserExists,
