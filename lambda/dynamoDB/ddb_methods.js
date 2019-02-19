@@ -87,12 +87,13 @@ const getDescription = async (name, gender, sentenceNumber) => {
   };
   try {
     const data = await docClient.get(params).promise();
+    // Index of second sentence
     const splitIndex = data.Item.NAME_DESCRIPTION.match('(?:[^.]+[.:;]){2}')[0].length;
 
     if (sentenceNumber === 1) {
       return data.Item.NAME_DESCRIPTION.substring(0, splitIndex);
     }
-    return data.Item.NAME_DESCRIPTION.substring(184);
+    return data.Item.NAME_DESCRIPTION.substring(splitIndex);
   } catch (error) {
     return {
       statusCode: 400,
@@ -109,12 +110,14 @@ const getDescription = async (name, gender, sentenceNumber) => {
   //   };
   // }
 };
-
+// const userName = 'Greg';
+// const gender = 'male'
+// getDescription(userName, gender, 2).then(data => console.log(data))
 // const help = async () => {
-//   const scrape = await scraper.getNameDescription('Greg', 'male', 4);
+//   const scrape = await scraper.getNameDescription('Kevin', 'male', 4);
 //   console.log(scrape)
-//   await addUser('Greg', 'male', scrape);
-//   const final = await getDescription('Greg', 'male', 1);
+//   await addUser('Kevin', 'male', scrape);
+//   const final = await getDescription('Kevin', 'male', 1);
 //   return final;
 // };
 // help()

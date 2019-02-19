@@ -2,6 +2,8 @@ const Alexa = require('ask-sdk');
 const scrape = require('./scraper/paragraphGenerator.js');
 const ddb = require('./dynamoDB/ddb_methods.js');
 
+const rePrompt = 'Surrender your name and gender';
+
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
@@ -11,7 +13,7 @@ const LaunchRequestHandler = {
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt(speechText)
+      .reprompt(rePrompt)
       .getResponse();
   },
 };
@@ -43,11 +45,14 @@ const CompletedGetNameGenderIntentHandler = {
 
     sessionAttributes.userName = userName;
     sessionAttributes.gender = gender;
-      
+
     if (await ddb.checkUserExists(userName, gender)) {
       const speechText = `${await ddb.getDescription(userName, gender, 1)} Would you like to hear more?`;
+      sessionAttributes.dialog = 'First description read.';
       sessionAttributes.description = await ddb.getDescription(userName, gender, 1);
-      
+      sessionAttributes.description2 = await ddb.getDescription(userName, gender, 2);
+
+
       await handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
       return handlerInput.responseBuilder
@@ -57,16 +62,13 @@ const CompletedGetNameGenderIntentHandler = {
 
     const description = await scrape.getNameDescription(userName, gender, 4);
     await ddb.addUser(userName, gender, description);
-    let speechText = await ddb.getDescription(userName, gender, 1);
-
+    const speechText = `${await ddb.getDescription(userName, gender, 1)} Would you like to hear more?`;
+    // Save first and second half of the name description to persistent session variables.
     sessionAttributes.description = await ddb.getDescription(userName, gender, 1);
+    sessionAttributes.description2 = await ddb.getDescription(userName, gender, 2);
 
     // sessionAttributes.sentenceNumber += 2;
     await handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-    while (speechText === undefined) {
-      speechText = await ddb.getDescription(userName, gender, 1);
-    }
-
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -74,23 +76,59 @@ const CompletedGetNameGenderIntentHandler = {
   },
 };
 
-// const ContinueDescriptionIntentHandler ={
-//   canHandle(handlerInput) {
-//     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-//     && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent';
+const ContinueDescriptionIntentHandler = {
+  canHandle(handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
-//   },
-//   async handle(handlerInput) {
-//     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-//     const count = sessionAttributes.sentenceNumber;
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+    && sessionAttributes.dialog === 'First description read.'
+    && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent'
+    || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.NoIntent');
+  },
+  handle(handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    if (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent') {
+      const speechText = `${sessionAttributes.description2} Would you like to hear about another name?`;
+      sessionAttributes.dialog = 'Second description read.';
+      return handlerInput.responseBuilder
+        .speak(speechText)
+        .getResponse();
+    }
+    const speechText = 'Would you like to hear about another name?';
+    sessionAttributes.dialog = 'Second description read.';
+    
 
-//     const speechText = await ddb.getDescription(userName, gender, count);
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .getResponse();
+  },
+};
 
-//     return handlerInput.responseBuilder
-//     .speak(speechText)
-//     .getResponse();
-//   },
-// };
+const RestartorEndIntentHandler = {
+  canHandle(handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+    && sessionAttributes.dialog === 'Second description read.'
+    && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent'
+    || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.NoIntent');
+  },
+  handle(handlerInput) {
+    if (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent') {
+      const speechText = 'Please give me another name and gender so I can analyze it.';
+
+      return handlerInput.responseBuilder
+        .speak(speechText)
+        .getResponse();
+    }
+    const speechText = 'Thanks for using Name Analyzer, goodbye!';
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .withShouldEndSession(true)
+      .getResponse();
+  },
+};
 // const CompletedGetNickNameGenderIntentHandler = {
 //   canHandle(handlerInput) {
 //     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -275,7 +313,8 @@ exports.handler = Alexa.SkillBuilders.custom()
     InProgressGetNameGenderIntentHandler,
     CompletedGetNameGenderIntentHandler,
     HelpIntentHandler,
-    // InProgressStartOverIntentHandler,
+    ContinueDescriptionIntentHandler,
+    RestartorEndIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler,
   )
