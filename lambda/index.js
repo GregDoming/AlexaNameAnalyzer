@@ -26,7 +26,6 @@ const InProgressGetNameGenderIntentHandler = {
       && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED';
   },
   handle(handlerInput) {
-    console.log('line 29');
     return handlerInput.responseBuilder
       .reprompt(rePrompt)
       .getResponse();
@@ -208,16 +207,45 @@ const SessionEndedRequestHandler = {
 };
 
 
+// const PauseIntentHandler = {
+//   canHandle(handlerInput) {
+//     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+//     && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.PauseIntent';
+//   },
+//   handle(handlerInput) {
+//     return handlerInput.responseBuilder.getResponse();
+//   },
+// };
+
+// const ResumeIntentHandler = {
+//   canHandle(handlerInput) {
+//     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+//     && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.ResumeIntent';
+//   },
+//   handle(handlerInput) {
+//     handlerInput.attributesManager.getSessionAttributes();    
+//     return handlerInput.responseBuilder.getResponse();
+//   },
+// };
+
+
 const ErrorHandler = {
   canHandle() {
     return true;
   },
   handle(handlerInput, error) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    let speechText = ''
+    if (sessionAttributes.gender && sessionAttributes.userName) speechText = 'Sorry I did not get that. Surrender you name and gender';
+    if (!sessionAttributes.gender && sessionAttributes.userName) speechText = 'Sorry I did not understand that. What is your gender again?';
+    if (sessionAttributes.gender && !sessionAttributes.userName) speechText = 'Sorry did not catch waht you said. What is your name?';
+    if (!sessionAttributes.gender && !sessionAttributes.userName) speechText = 'Sorry I did not understand that. Name and Gender please.';
+
     console.log(`Error handled: ${error.message}`);
 
     return handlerInput.responseBuilder
-      .speak('Sorry, I can\'t understand the command. Please say your name.')
-      .reprompt('Sorry, I can\'t understand the command. Please say your name.')
+      .speak(speechText)
+      .reprompt(speechText)
       .getResponse();
   },
 };

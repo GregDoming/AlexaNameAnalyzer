@@ -30,3 +30,5 @@ zip.writeZip('deployment/lambda_zip/nameAnalyzer.zip');
 //   if (err) console.log(err, err.stack); // an error occurred
 //   else     console.log(data);           // successful response
 // });
+
+//ask api get-skill -s amzn1.ask.skill.470fcaa9-d8d9-4c48-8ac3-37b8425bd784 --stage development > model/InteractionModel.json

@@ -1,5 +1,4 @@
 const AWS = require('aws-sdk');
-const scraper = require('../scraper/paragraphGenerator.js')
 
 /**
  * Adds the name, gender, and description of a user to DynamoDB and returns a string (promise), it will not overwrite.

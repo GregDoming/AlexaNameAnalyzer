@@ -4,8 +4,10 @@
   "description": "Alexa First Name Analyzer",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "update": "node deployment/scripts/lambda_deploy.js && aws lambda update-function-code --function-name nameAnalyzer --zip-file fileb://deployment/lambda_zip/nameAnalyzer.zip"
+    "test": "mocha",
+    "update": "node deployment/scripts/lambda_deploy.js && aws lambda update-function-code --function-name nameAnalyzer --zip-file fileb://deployment/lambda_zip/nameAnalyzer.zip",
+    "update-manifest": "node deployment/scripts/lambda_deploy.js && aws lambda update-function-code --function-name nameAnalyzer --zip-file fileb://deployment/lambda_zip/nameAnalyzer.zip && ask api get-model -s amzn1.ask.skill.470fcaa9-d8d9-4c48-8ac3-37b8425bd784 --stage development -l en-US > model/InteractionModel.json",
+    "upload-manifest": "ask api update-model --skill-id amzn1.ask.skill.470fcaa9-d8d9-4c48-8ac3-37b8425bd784 --file model/UpdateModel.json --locale en-US"
   },
   "repository": {
     "type": "git",
@@ -22,16 +24,22 @@
     "ask-sdk-dynamodb-persistence-adapter": "^2.3.0",
     "ask-sdk-model": "^1.11.2",
     "aws-sdk": "^2.401.0",
-    "cheerio": "^1.0.0-rc.2",
     "child_process": "^1.0.2",
     "dotenv": "^6.2.0",
-    "request-promise": "^4.2.2",
+    "lambda-local": "^1.5.2",
     "rp": "^0.2.0"
   },
   "devDependencies": {
     "adm-zip": "^0.4.13",
+    "alexa-skill-test-framework": "^1.2.4",
+    "ask-sdk": "^2.3.0",
+    "aws-sdk-mock": "^4.3.1",
+    "cheerio": "^1.0.0-rc.2",
     "fs": "0.0.1-security",
-    "jest": "^24.1.0",
-    "path": "^0.12.7"
+    "mocha": "^6.0.0",
+    "path": "^0.12.7",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "virtual-alexa": "^0.6.14"
   }
 }
