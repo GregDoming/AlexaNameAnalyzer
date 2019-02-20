@@ -18,23 +18,23 @@ describe('Name Analyzer Skill returns correct result', () => {
     ]);
   });
 
-  describe('RestartorEndIntentHandler returns correct result', () => {
+  describe('RestartorEndIntentHandler prompts user for name and gender on YesIntent', () => {
     alexaTest.test([
       { 
         request: alexaTest.getIntentRequest('AMAZON.YesIntent'),
-        withSessionAttributes: {dialog: 'Second description read.'},
-        says: 'Please give me another name and gender so I can analyze it.'
-      },  
+        withSessionAttributes: {dialog: 'Second description read.' },
+        says: 'Please give me another name and gender so I can analyze it.',
+      },
     ]);
   });
 
-  describe('RestartorEndIntentHandler ends the session', () => {
+  describe('RestartorEndIntentHandler ends the session on Nointent', () => {
     alexaTest.test([
       { 
         request: alexaTest.getIntentRequest('AMAZON.NoIntent'),
-        withSessionAttributes: {dialog: 'Second description read.'},
-        shouldEndSession: true
-      },  
+        withSessionAttributes: {dialog: 'Second description read.' },
+        shouldEndSession: true,
+      },
     ]);
   });
 
