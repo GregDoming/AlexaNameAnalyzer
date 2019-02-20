@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk');
+const scraper = require('../scraper/paragraphGenerator.js')
 
 /**
  * Adds the name, gender, and description of a user to DynamoDB and returns a string (promise), it will not overwrite.
@@ -11,8 +12,8 @@ const addUser = async (name, gender, description) => {
   AWS.config.update({
     region: 'us-west-2',
   });
-
   const docClient = new AWS.DynamoDB.DocumentClient();
+
   const params = {
     TableName: 'USER_LIST',
     Item: {
@@ -20,6 +21,7 @@ const addUser = async (name, gender, description) => {
       GENDER: gender,
       NAME_DESCRIPTION: description,
     },
+    ReturnValues: 'ALL_OLD'
   };
 
   await docClient.put(params, (err, data) => {
@@ -41,8 +43,8 @@ const checkUserExists = async (name, gender) => {
   AWS.config.update({
     region: 'us-west-2',
   });
+  const docClient = new AWS.DynamoDB.DocumentClient();
 
-  const docClient = await new AWS.DynamoDB.DocumentClient();
 
   const params = {
     TableName: 'USER_LIST',
@@ -74,8 +76,8 @@ const getDescription = async (name, gender, sentenceNumber) => {
   AWS.config.update({
     region: 'us-west-2',
   });
-
   const docClient = new AWS.DynamoDB.DocumentClient();
+  
 
   const params = {
     TableName: 'USER_LIST',
@@ -86,7 +88,7 @@ const getDescription = async (name, gender, sentenceNumber) => {
   };
   try {
     const data = await docClient.get(params).promise();
-    // Index of second sentence
+    // Index of the start of the THIRD sentence
     const splitIndex = data.Item.NAME_DESCRIPTION.match('(?:[^.]+[.:;]){2}')[0].length;
 
     if (sentenceNumber === 1) {
@@ -99,18 +101,8 @@ const getDescription = async (name, gender, sentenceNumber) => {
       error: `Could not connect to db ${error.stack}`,
     };
   }
-  // try {
-  //   const data = await docClient.get(params).promise();
-  //   return `${data.Item.NAME_DESCRIPTION[0]} ${data.Item.NAME_DESCRIPTION[1]}.`;
-  // } catch (error) {
-  //   return {
-  //     statusCode: 400,
-  //     error: `Could not connect to db ${error.stack}`,
-  //   };
-  // }
 };
-// const userName = 'zack';
-// const gender = 'female'
+//for testing locally until I get Mocha tests up.
 
 // const help = async () => {
 //   const scrape = await scraper.getNameDescription(userName, gender, 4);
@@ -120,6 +112,8 @@ const getDescription = async (name, gender, sentenceNumber) => {
 //   return final;
 // };
 // help()
+// addUser(userName, gender, 'dfgsfdgfsdhfsdhdgfhfd')
+
 module.exports = {
   addUser,
   checkUserExists,

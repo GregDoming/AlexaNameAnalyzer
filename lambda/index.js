@@ -23,7 +23,7 @@ const InProgressGetNameGenderIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
       && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameGenderIntent'
-      && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED';
+      && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED'; // Will not move to next intent until dialog state === 'COMPLETED' by filling required slot values
   },
   handle(handlerInput) {
     return handlerInput.responseBuilder
@@ -49,8 +49,9 @@ const CompletedGetNameGenderIntentHandler = {
     sessionAttributes.gender = gender;
 
     if (await ddb.checkUserExists(userName, gender)) {
+      // Sets speechText to the first half of the description. 1 = first-half 2 = seconf-half
       const speechText = `${await ddb.getDescription(userName, gender, 1)} Would you like to hear more?`;
-
+      // SessionAttributes.Dialog lets future Intent Handlers know what part of the dialog tree the Alexa skill is at
       sessionAttributes.dialog = 'First description read.';
       sessionAttributes.description = await ddb.getDescription(userName, gender, 1);
       sessionAttributes.description2 = await ddb.getDescription(userName, gender, 2);
@@ -70,6 +71,7 @@ const CompletedGetNameGenderIntentHandler = {
     sessionAttributes.description2 = await ddb.getDescription(userName, gender, 2);
     await handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
+    // Performing three consecutive async calls occasionally times-out the Alexa skill. This allows the user to still hear first half of skill in case of timeout
     if (speechText === '[object Object] Would you like to hear more?') {
       sessionAttributes.dialog = 'Description timed out.';
       return handlerInput.responseBuilder
@@ -84,7 +86,7 @@ const CompletedGetNameGenderIntentHandler = {
   },
 };
 
-
+//Reads first description in case of previously mentioned timeout
 const DatabaseTimeoutIntentHandler = {
   canHandle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
@@ -104,7 +106,7 @@ const DatabaseTimeoutIntentHandler = {
   },
 };
 
-
+//Asks user if they would like the second half of the name description
 const ContinueDescriptionIntentHandler = {
   canHandle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
@@ -133,6 +135,7 @@ const ContinueDescriptionIntentHandler = {
   },
 };
 
+// Asks the user if they would like to hear another name or end the skill.
 const RestartorEndIntentHandler = {
   canHandle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
@@ -207,26 +210,20 @@ const SessionEndedRequestHandler = {
 };
 
 
-// const PauseIntentHandler = {
-//   canHandle(handlerInput) {
-//     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-//     && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.PauseIntent';
-//   },
-//   handle(handlerInput) {
-//     return handlerInput.responseBuilder.getResponse();
-//   },
-// };
+const FallbackHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    return request.type === 'IntentRequest'
+      && request.intent.name === 'AMAZON.FallbackIntent';
+  },
 
-// const ResumeIntentHandler = {
-//   canHandle(handlerInput) {
-//     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-//     && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.ResumeIntent';
-//   },
-//   handle(handlerInput) {
-//     handlerInput.attributesManager.getSessionAttributes();    
-//     return handlerInput.responseBuilder.getResponse();
-//   },
-// };
+  handle(handlerInput) {
+    return handlerInput.responseBuilder
+      .speak('I didnt get that, Name and gender please?')
+      .reprompt(reprompt)
+      .getResponse();
+  },
+};
 
 
 const ErrorHandler = {
@@ -234,19 +231,13 @@ const ErrorHandler = {
     return true;
   },
   handle(handlerInput, error) {
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    let speechText = ''
-    if (sessionAttributes.gender && sessionAttributes.userName) speechText = 'Sorry I did not get that. Surrender you name and gender';
-    if (!sessionAttributes.gender && sessionAttributes.userName) speechText = 'Sorry I did not understand that. What is your gender again?';
-    if (sessionAttributes.gender && !sessionAttributes.userName) speechText = 'Sorry did not catch waht you said. What is your name?';
-    if (!sessionAttributes.gender && !sessionAttributes.userName) speechText = 'Sorry I did not understand that. Name and Gender please.';
-
+    console.log('error intent')
     console.log(`Error handled: ${error.message}`);
 
     return handlerInput.responseBuilder
-      .speak(speechText)
-      .reprompt(speechText)
-      .getResponse();
+    .speak('Sorry, I cant understand the command. Can I have your name and gender please?')
+    .reprompt('Sorry, I cant understand the command. Surrender your name and gender.')
+    .getResponse();
   },
 };
 
@@ -259,6 +250,7 @@ exports.handler = Alexa.SkillBuilders.custom()
     RestartorEndIntentHandler,
     DatabaseTimeoutIntentHandler,
     HelpIntentHandler,
+    FallbackHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler,
   )

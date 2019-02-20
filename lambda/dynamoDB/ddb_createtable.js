@@ -4,6 +4,8 @@ AWS.config.update({ region: 'us-west-2' });
 
 const ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 
+  // Schema used to create DynamoDB table
+
 const params = {
   AttributeDefinitions: [
     {
