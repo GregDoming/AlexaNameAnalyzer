@@ -110,14 +110,14 @@ const getDescription = async (name, gender, sentenceNumber) => {
   //   };
   // }
 };
-// const userName = 'Greg';
-// const gender = 'male'
-// getDescription(userName, gender, 2).then(data => console.log(data))
+// const userName = 'zack';
+// const gender = 'female'
+
 // const help = async () => {
-//   const scrape = await scraper.getNameDescription('Kevin', 'male', 4);
+//   const scrape = await scraper.getNameDescription(userName, gender, 4);
 //   console.log(scrape)
-//   await addUser('Kevin', 'male', scrape);
-//   const final = await getDescription('Kevin', 'male', 1);
+//   await addUser(userName, gender, scrape);
+//   const final = await getDescription(userName, gender, 1);
 //   return final;
 // };
 // help()

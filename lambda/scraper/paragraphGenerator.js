@@ -12,7 +12,7 @@ const cheerio = require('cheerio');
 const getNameDescription = async (name, gender, n) => {
   const url = await rp(`https://www.kabalarians.com/name-meanings/names/${gender}/${name}.htm`);
   const cheer = cheerio.load(url);
-  const nameDescription = cheer('#headerOL').contents().slice(3, 4).text();
+  const nameDescription = cheer('#headerOL').contents().slice(3, 4).text().replace(/\s\s+/g, ' ');
 
   const result = await nthIndex(nameDescription, '.', n + 1);
 
