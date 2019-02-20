@@ -1,0 +1,56 @@
+{
+  "manifest": {
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-west-2:822617710188:function:nameAnalyzer"
+        },
+        "interfaces": [
+          {
+            "type": "AUDIO_PLAYER"
+          },
+          {
+            "type": "RENDER_TEMPLATE",
+            "minimumTemplateVersion": "1.0"
+          },
+          {
+            "type": "CAN_FULFILL_INTENT_REQUEST"
+          }
+        ]
+      }
+    },
+    "manifestVersion": "1.0",
+    "privacyAndCompliance": {
+      "locales": {
+        "en-US": {}
+      }
+    },
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "name": "FirstNameFun",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/585d/bc2db32954ba4b1e8789c1188a0483dd/APP_ICON?versionId=hd1_OQbmSv1ci202b9Cn8UbFXO8xUHRe&AWSAccessKeyId=AKIAJFEYRBGIHK2BBYKA&Expires=1550747929&Signature=v0qt93n7%2FhN8LQxcwgVGCMETPVs%3D",
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/9fa4/b9fc08b58f764facbbae1d28455be291/APP_ICON_LARGE?versionId=jucwYihh58PUa0oZp4VSMwl8mbV44IaW&AWSAccessKeyId=AKIAJFEYRBGIHK2BBYKA&Expires=1550747929&Signature=LrLGhpP%2BMfSgTmVIOYqVK1%2FLeaM%3D",
+          "summary": "Analyzes your name and gender to produce insights about the user.",
+          "description": "Analyzes your name and gender to produce insights about the user.",
+          "examplePhrases": [
+            "Alexa open name analyzer",
+            "My name is Greg and I am male",
+            ""
+          ],
+          "keywords": [
+            "Horoscope",
+            "name",
+            "analyzer",
+            "information",
+            "fun"
+          ],
+          "updatesDescription": "Can restart Skill."
+        }
+      },
+      "isAvailableWorldwide": true,
+      "category": "KNOWLEDGE_AND_TRIVIA",
+      "distributionCountries": []
+    }
+  }
+}
