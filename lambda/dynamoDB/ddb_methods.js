@@ -102,7 +102,7 @@ const getDescription = async (name, gender, sentenceNumber) => {
     };
   }
 };
-//for testing locally until I get Mocha tests up.
+// for testing locally until I get Mocha tests up.
 
 // const help = async () => {
 //   const scrape = await scraper.getNameDescription(userName, gender, 4);
@@ -112,7 +112,6 @@ const getDescription = async (name, gender, sentenceNumber) => {
 //   return final;
 // };
 // help()
-// addUser(userName, gender, 'dfgsfdgfsdhfsdhdgfhfd')
 
 module.exports = {
   addUser,
