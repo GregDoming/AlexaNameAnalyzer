@@ -17,6 +17,8 @@ In the **model** folder the interaction model.json is the most recently download
 
 If you would like to use TravisCi you will need to encrypt the access keys to AWS. Email me for code/instructions.
 
+Now uploading lambda file configuration when Lambda function is uploaded so settings no longer get reset.
+
 Some features I would like to add:
 
 DynamoDB testing,
