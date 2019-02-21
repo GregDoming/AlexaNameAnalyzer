@@ -13,7 +13,8 @@ const getNameDescription = async (name, gender, n) => {
   const url = await rp(`https://www.kabalarians.com/name-meanings/names/${gender}/${name}.htm`);
   const cheer = cheerio.load(url);
   // Scrapes the entire name dexcription and gets rid of double spaces to comply with Alexa ssml formating.
-  const nameDescription = cheer('#headerOL').contents().slice(3, 4).text().replace(/\s\s+/g, ' ');
+  const nameDescription = cheer('#headerOL').contents().slice(3, 4).text()
+    .replace(/\s\s+/g, ' ');
   // Returns the first n sentences from the description.
   const result = await nthIndex(nameDescription, '.', n + 1);
 

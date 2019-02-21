@@ -32,7 +32,7 @@ describe('Name Analyzer Skill returns correct result', () => {
     alexaTest.test([
       { 
         request: alexaTest.getIntentRequest('AMAZON.NoIntent'),
-        withSessionAttributes: {dialog: 'Second description read.' },
+        withSessionAttributes: { dialog: 'Second description read.' },
         shouldEndSession: true,
       },
     ]);

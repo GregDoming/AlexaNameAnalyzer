@@ -86,7 +86,7 @@ const CompletedGetNameGenderIntentHandler = {
   },
 };
 
-//Reads first description in case of previously mentioned timeout
+// Reads first description in case of previously mentioned timeout
 const DatabaseTimeoutIntentHandler = {
   canHandle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
@@ -106,7 +106,7 @@ const DatabaseTimeoutIntentHandler = {
   },
 };
 
-//Asks user if they would like the second half of the name description
+// Asks user if they would like the second half of the name description
 const ContinueDescriptionIntentHandler = {
   canHandle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
@@ -231,13 +231,13 @@ const ErrorHandler = {
     return true;
   },
   handle(handlerInput, error) {
-    console.log('error intent')
+    console.log('error intent');
     console.log(`Error handled: ${error.message}`);
 
     return handlerInput.responseBuilder
-    .speak('Sorry, I cant understand the command. Can I have your name and gender please?')
-    .reprompt('Sorry, I cant understand the command. Surrender your name and gender.')
-    .getResponse();
+      .speak('Sorry, I cant understand the command. Can I have your name and gender please?')
+      .reprompt('Sorry, I cant understand the command. Surrender your name and gender.')
+      .getResponse();
   },
 };
 

@@ -1,34 +1,48 @@
+/* eslint-disable no-console */
 const AWS = require('aws-sdk');
 const AdmZip = require('adm-zip');
-const dotenv = require('dotenv');
-
 
 const zip = new AdmZip();
-//  adds the folder and all the colders children to the zip que 
-
+//  Adds the folder and all the folders children to the zip que
 zip.addLocalFolder('lambda');
-//  zips all files in the zip que
 
+//  Zips all files in the zip que to specified location
 zip.writeZip('deployment/lambda_zip/nameAnalyzer.zip');
 
-// const bufferedZip = zip.toBuffer();
+// Formats zip to properly upload to AWS Lambda
+const bufferedZip = zip.toBuffer();
 
-// const lambda = new AWS.Lambda({
-//     region: 'us-west-2',
-//     accessKeyId: process.env.AWS_ACCESS_KEY,
-//     secretAccessKey: process.env.AWS_SECRET_KEY,
-// });
+const lambda = new AWS.Lambda({
+  region: 'us-west-2',
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_KEY,
+});
 
-// const updateFunctionParams = {
-//   FunctionName: 'nameAnalyzer', /* required */
-//   DryRun: false,
-//   Publish: false,
-//   ZipFile: bufferedZip,
-// };
+const updateFunctionParams = {
+  FunctionName: 'nameAnalyzer',
+  DryRun: false,
+  Publish: false,
+  ZipFile: bufferedZip,
+};
 
-// lambda.updateFunctionCode(updateFunctionParams, (err, data) => {
-//   if (err) console.log(err, err.stack); // an error occurred
-//   else     console.log(data);           // successful response
-// });
+const updateFunctionConfiguration = {
+  FunctionName: 'nameAnalyzer',
+  MemorySize: 128,
+  Timeout: 10,
+  Runtime: 'nodejs8.10',
+};
 
-//ask api get-skill -s amzn1.ask.skill.470fcaa9-d8d9-4c48-8ac3-37b8425bd784 --stage development > model/InteractionModel.json
+// Updates Lambda Function code
+lambda.updateFunctionCode(updateFunctionParams, (err, data) => {
+  if (err) console.log(err, err.stack); 
+  else console.log(data);
+});
+
+// Updates Lambda Function settings, there are many settings I am not interacting with yet.
+lambda.updateFunctionConfiguration(updateFunctionConfiguration, (err, data) => {
+  if (err) console.log(err, err.stack);
+  else console.log(data);
+});
+
+// Code to update the function from the CLI (keeping here in case I decide to revert back)
+// aws lambda update-function-code --function-name nameAnalyzer --zip-file fileb://deployment/lambda_zip/nameAnalyzer.zip --timeout 10 --memory-size 128

@@ -21,7 +21,7 @@ const addUser = async (name, gender, description) => {
       GENDER: gender,
       NAME_DESCRIPTION: description,
     },
-    ReturnValues: 'ALL_OLD'
+    ReturnValues: 'ALL_OLD',
   };
 
   await docClient.put(params, (err, data) => {

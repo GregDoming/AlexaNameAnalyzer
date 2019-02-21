@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "update": "node deployment/scripts/lambda_deploy.js && aws lambda update-function-code --function-name nameAnalyzer --zip-file fileb://deployment/lambda_zip/nameAnalyzer.zip",
-    "update-manifest": "node deployment/scripts/lambda_deploy.js && aws lambda update-function-code --function-name nameAnalyzer --zip-file fileb://deployment/lambda_zip/nameAnalyzer.zip && ask api get-model -s amzn1.ask.skill.470fcaa9-d8d9-4c48-8ac3-37b8425bd784 --stage development -l en-US > model/InteractionModel.json",
+    "update": "node deployment/scripts/lambda_deploy.js",
+    "update-manifest": "node deployment/scripts/lambda_deploy.js && ask api get-model -s amzn1.ask.skill.470fcaa9-d8d9-4c48-8ac3-37b8425bd784 --stage development -l en-US > model/InteractionModel.json",
     "upload-manifest": "ask api update-model --skill-id amzn1.ask.skill.470fcaa9-d8d9-4c48-8ac3-37b8425bd784 --file model/UpdateModel.json --locale en-US"
   },
   "repository": {
