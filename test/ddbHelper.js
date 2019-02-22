@@ -17,9 +17,9 @@ module.exports.mockDB = () => {
   const docClient = new AWS.DynamoDB();
 
   return new Promise((resolve, reject) => {
-	   dynaliteServer.listen(4567, (err) => {
-	     docClient.listTables({}, (err, data) => {
-        if (err) console.log(err, err.stack); // an error occurred
+    dynaliteServer.listen(4567, (err) => {
+      docClient.listTables({}, (err, data) => {
+        if (err) console.log(err, err.stack);
         else if (data.TableNames.length <= 0) {
           docClient.createTable({
             TableName: 'TestDB',
@@ -46,8 +46,8 @@ module.exports.mockDB = () => {
               }, 1000);
             }
           });
-			   } else { resolve(); }
-		    });
+        } else { resolve(); }
+      });
     });
   });
 };

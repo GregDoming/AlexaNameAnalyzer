@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const AWS = require('aws-sdk');
 
 AWS.config.update({ region: 'us-west-2' });
@@ -39,8 +40,8 @@ const params = {
 
 ddb.createTable(params, (err, data) => {
   if (err) {
-    console.log("ERROR", err);
+    console.log('ERROR', err);
   } else {
-    console.log("Table Created", data);
+    console.log('Table Created', data);
   }
 });

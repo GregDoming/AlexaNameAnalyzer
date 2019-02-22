@@ -5,7 +5,7 @@ const cheerio = require('cheerio');
  * Scrapes kabalarians.com for name analyzation and returns a string.
  * @param  {string} name The name to look up.
  * @param {string} gender The gender to look up with the name. Male and female give different descriptions
- * @param {number} n Grabs the first n sentences of the description.
+ * @param {number} n Grabs the first n sentences of the description (up to seven).
  */
 
 
@@ -24,8 +24,8 @@ const getNameDescription = async (name, gender, n) => {
 /**
  * Helper function to return n sentences from the scraped website.
  * @param {str} str some name
- * @param {gender} gender The second number to add.
- * @return {result} The first n (from the helper function nth index) sentences returned from webstie
+ * @param {gender} pattern The string pattern to look for.
+ * @return {result} The first n - 1 (from the helper function nth index) sentences returned from webstie
  */
 
 const nthIndex = async (str, pat, n) => {
@@ -41,8 +41,7 @@ const nthIndex = async (str, pat, n) => {
 
   return finalDescription.concat('.');
 };
-
-
+getNameDescription('Greg', 'male', 4);
 module.exports = {
   getNameDescription,
   nthIndex,

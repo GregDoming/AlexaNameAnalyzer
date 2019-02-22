@@ -34,7 +34,7 @@ const updateFunctionConfiguration = {
 
 // Updates Lambda Function code
 lambda.updateFunctionCode(updateFunctionParams, (err, data) => {
-  if (err) console.log(err, err.stack); 
+  if (err) console.log(err, err.stack);
   else console.log(data);
 });
 
