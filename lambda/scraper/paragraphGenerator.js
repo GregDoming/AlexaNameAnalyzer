@@ -23,8 +23,8 @@ const getNameDescription = async (name, gender, n) => {
 
 /**
  * Helper function to return n sentences from the scraped website.
- * @param {str} str some name
- * @param {gender} pattern The string pattern to look for.
+ * @param {string} str some name
+ * @param {string} pattern The string pattern to look for.
  * @return {result} The first n - 1 (from the helper function nth index) sentences returned from webstie
  */
 
