@@ -8,7 +8,6 @@ const cheerio = require('cheerio');
  * @param {number} n Grabs the first n sentences of the description (up to seven).
  */
 
-
 const getNameDescription = async (name, gender, n) => {
   const url = await rp(`https://www.kabalarians.com/name-meanings/names/${gender}/${name}.htm`);
   const cheer = cheerio.load(url);
@@ -41,7 +40,7 @@ const nthIndex = async (str, pat, n) => {
 
   return finalDescription.concat('.');
 };
-getNameDescription('Greg', 'male', 4);
+
 module.exports = {
   getNameDescription,
   nthIndex,

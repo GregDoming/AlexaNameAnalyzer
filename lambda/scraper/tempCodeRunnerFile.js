@@ -1,1 +1,1 @@
-    temp = index;
+getNameDescription('Greg', 'male', 4);

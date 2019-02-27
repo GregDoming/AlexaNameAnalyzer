@@ -27,7 +27,7 @@ const updateFunctionParams = {
 
 const updateFunctionConfiguration = {
   FunctionName: 'nameAnalyzer',
-  MemorySize: 128,
+  MemorySize: 256,
   Timeout: 10,
   Runtime: 'nodejs8.10',
 };

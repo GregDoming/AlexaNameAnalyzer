@@ -2,7 +2,7 @@ const Alexa = require('ask-sdk');
 const scrape = require('./scraper/paragraphGenerator.js');
 const ddb = require('./dynamoDB/ddb_methods.js');
 
-const rePrompt = 'Surrender your name and gender';
+const reprompt = 'Surrender your name and gender';
 
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
@@ -13,7 +13,8 @@ const LaunchRequestHandler = {
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt(rePrompt)
+      .withShouldEndSession(false)
+      .reprompt(reprompt)
       .getResponse();
   },
 };
@@ -26,8 +27,12 @@ const InProgressGetNameGenderIntentHandler = {
       && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED'; // Will not move to next intent until dialog state === 'COMPLETED' by filling required slot values
   },
   handle(handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    sessionAttributes.dialog = 'Started';
+
     return handlerInput.responseBuilder
       .reprompt(rePrompt)
+      .withShouldEndSession(false)
       .getResponse();
   },
 };
@@ -60,6 +65,7 @@ const CompletedGetNameGenderIntentHandler = {
 
       return handlerInput.responseBuilder
         .speak(speechText)
+        .withShouldEndSession(false)
         .getResponse();
     }
     const description = await scrape.getNameDescription(userName, gender, 4);
@@ -76,12 +82,14 @@ const CompletedGetNameGenderIntentHandler = {
       sessionAttributes.dialog = 'Description timed out.';
       return handlerInput.responseBuilder
         .speak('That took awhile. Would you like to hear the description now?')
+        .withShouldEndSession(false)
         .getResponse();
     }
     sessionAttributes.dialog = 'First description read.';
 
     return handlerInput.responseBuilder
       .speak(speechText)
+      .withShouldEndSession(false)
       .getResponse();
   },
 };
@@ -102,6 +110,7 @@ const DatabaseTimeoutIntentHandler = {
 
     return handlerInput.responseBuilder
       .speak(speechText)
+      .withShouldEndSession(false)
       .getResponse();
   },
 };
@@ -123,6 +132,7 @@ const ContinueDescriptionIntentHandler = {
       sessionAttributes.dialog = 'Second description read.';
       return handlerInput.responseBuilder
         .speak(speechText)
+        .withShouldEndSession(false)
         .getResponse();
     }
     const speechText = 'Would you like to hear about another name?';
@@ -131,6 +141,7 @@ const ContinueDescriptionIntentHandler = {
 
     return handlerInput.responseBuilder
       .speak(speechText)
+      .withShouldEndSession(false)
       .getResponse();
   },
 };
@@ -151,6 +162,8 @@ const RestartorEndIntentHandler = {
 
       return handlerInput.responseBuilder
         .speak(speechText)
+        .reprompt(reprompt)
+        .withShouldEndSession(false)
         .getResponse();
     }
     const speechText = 'Thanks for using Name Analyzer, goodbye!';
@@ -173,12 +186,14 @@ const HelpIntentHandler = {
     if (sessionAttributes.gender) {
       const speechText = 'Sure! If you want to continue give me your name and I can give you the meaning behind it';
       return handlerInput.responseBuilder
+        .withShouldEndSession(false)
         .speak(speechText)
         .getResponse();
     }
     const speechText = 'Sure! If you want to continue give me your gender and I can give you the meaning behind it';
     return handlerInput.responseBuilder
       .speak(speechText)
+      .withShouldEndSession(false)
       .getResponse();
   },
 };
@@ -187,10 +202,11 @@ const HelpIntentHandler = {
 const CancelAndStopIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent';
+      && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent' 
+      || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent')
   },
   handle(handlerInput) {
-    const speechText = 'yes?';
+    const speechText = 'Yes? Would you like to hear about another name?';
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -204,8 +220,12 @@ const SessionEndedRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
   },
   handle(handlerInput) {
-    // any cleanup logic goes here
-    return handlerInput.responseBuilder.getResponse();
+    const speechText = 'Goodbye';
+    console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .getResponse();
   },
 };
 
@@ -218,6 +238,23 @@ const FallbackHandler = {
   },
 
   handle(handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+
+    if (sessionAttributes.dialog === 'First description read.') {
+      return handlerInput.responseBuilder
+        .speak('Sorry I couldnt understand you. Would you like me to continue with the description?')
+        .getResponse();
+    }
+    if (sessionAttributes.dialog === 'Second description read.') {
+      return handlerInput.responseBuilder
+        .speak('Sorry I couldnt understand you. Would you like me to read another name?')
+        .getResponse();
+    }
+    if (sessionAttributes.dialog === 'Description timed out.') {
+      return handlerInput.responseBuilder
+        .speak('Sorry I didint quite get that. Would you like me to begin the description?')
+        .getResponse();
+    }
     return handlerInput.responseBuilder
       .speak('I didnt get that, Name and gender please?')
       .reprompt(reprompt)
@@ -237,6 +274,7 @@ const ErrorHandler = {
     return handlerInput.responseBuilder
       .speak('Sorry, I cant understand the command. Can I have your name and gender please?')
       .reprompt('Sorry, I cant understand the command. Surrender your name and gender.')
+      .withShouldEndSession(false)
       .getResponse();
   },
 };

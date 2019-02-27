@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const alexaTest = require('alexa-skill-test-framework');
 const AWS = require('aws-sdk-mock');
 // AWS.mock('DynamoDB')
@@ -20,7 +21,7 @@ describe('Name Analyzer Skill returns correct result', () => {
 
   describe('RestartorEndIntentHandler prompts user for name and gender on YesIntent', () => {
     alexaTest.test([
-      { 
+      {
         request: alexaTest.getIntentRequest('AMAZON.YesIntent'),
         withSessionAttributes: {dialog: 'Second description read.' },
         says: 'Please give me another name and gender so I can analyze it.',
