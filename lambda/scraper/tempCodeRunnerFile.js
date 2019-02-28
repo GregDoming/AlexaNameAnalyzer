@@ -1,1 +1,0 @@
-getNameDescription('Greg', 'male', 4);
