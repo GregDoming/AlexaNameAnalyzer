@@ -309,6 +309,7 @@ const FallbackHandler = {
   },
 };
 
+
 const InprogressResetLoginNameHandler = {
   canHandle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
@@ -322,7 +323,7 @@ const InprogressResetLoginNameHandler = {
     const sessionAttributes = attributesManager.getSessionAttributes();
     const persistentAttributes = await attributesManager.getPersistentAttributes() || {};
     const loginName = persistentAttributes.loginName;
-    const speechText = `${loginName} please give me a new login name`;
+    const speechText = 'Say <break time="0.2s" /> name is <break time="0.2s" /> followed by a new name <break time="0.1s" /> to change your username';
     sessionAttributes.state = 'loginName';
     attributesManager.setSessionAttributes(sessionAttributes);
 
@@ -332,6 +333,7 @@ const InprogressResetLoginNameHandler = {
       .getResponse();
   },
 };
+
 
 const ResetLoginNameHandler = {
   canHandle(handlerInput) {
@@ -343,12 +345,16 @@ const ResetLoginNameHandler = {
   },
   async handle(handlerInput) {
     const attributesManager = handlerInput.attributesManager;
+    const sessionAttributes = attributesManager.getSessionAttributes();
     const slots = handlerInput.requestEnvelope.request.intent.slots;
     const loginName = slots.loginName.value;
 
     const persistentAttributes = await attributesManager.getPersistentAttributes() || {};
     persistentAttributes.loginName = loginName;
     await attributesManager.savePersistentAttributes();
+
+    sessionAttributes.state = 'Start';
+    attributesManager.setSessionAttributes(sessionAttributes);
 
     const speechText = `Your name has been updated to ${loginName}. Please give me another name and gender to continue or you can say exit.`;
 
@@ -358,6 +364,7 @@ const ResetLoginNameHandler = {
       .getResponse();
   },
 };
+
 
 const RestartAppIntentHandler = {
   canHandle(handlerInput) {
@@ -378,6 +385,7 @@ const RestartAppIntentHandler = {
       .getResponse();
   },
 };
+
 
 const ErrorHandler = {
   canHandle() {
