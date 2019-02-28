@@ -1,3 +1,5 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable max-len */
 const Alexa = require('ask-sdk');
 const scrape = require('./scraper/paragraphGenerator.js');
 const ddb = require('./dynamoDB/ddb_methods.js');
@@ -8,8 +10,27 @@ const LaunchRequestHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
-  handle(handlerInput) {
-    const speechText = 'Welcome to Name Analyzer. I have some insight into your name... whats your first name and your gender?';
+  async handle(handlerInput) {
+    const attributesManager = handlerInput.attributesManager;
+    // Gets the db according to the user's unique Amazon ID (amz.etc.....).
+    const persistentAttributes = await attributesManager.getPersistentAttributes() || {};
+    // await attributesManager.deletePersistentAttributes(); <---- is for testing purposes.
+    const loginName = persistentAttributes.loginName;
+    const sessionAttributes = attributesManager.getSessionAttributes();
+    sessionAttributes.dialog = 'Started';
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+    // Checks to see if the user has logged in before.
+    if (!loginName) {
+      const speechText = 'Welcome to Name Analyzer. I have some insight into your name... whats your first name and gender?';
+
+      return handlerInput.responseBuilder
+        .speak(speechText)
+        .withShouldEndSession(false)
+        .reprompt(reprompt)
+        .getResponse();
+    }
+    const speechText = `Welcome back to Name Analyzer ${loginName}. Give me a first name and gender so I can analyze them please`;
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -29,9 +50,10 @@ const InProgressGetNameGenderIntentHandler = {
   handle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     sessionAttributes.dialog = 'Started';
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
     return handlerInput.responseBuilder
-      .reprompt(rePrompt)
+      .reprompt(reprompt)
       .withShouldEndSession(false)
       .getResponse();
   },
@@ -45,13 +67,21 @@ const CompletedGetNameGenderIntentHandler = {
     && handlerInput.requestEnvelope.request.dialogState === 'COMPLETED';
   },
   async handle(handlerInput) {
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    const attributesManager = handlerInput.attributesManager;
     const slots = handlerInput.requestEnvelope.request.intent.slots;
     const userName = slots.userName.value;
     const gender = slots.gender.value;
 
+    const persistentAttributes = await attributesManager.getPersistentAttributes() || {};
+    const sessionAttributes = attributesManager.getSessionAttributes();
+
     sessionAttributes.userName = userName;
     sessionAttributes.gender = gender;
+    // Checks if User has logged in before, if not sets user's login name permanantly.
+    if (!persistentAttributes.loginName) {
+      persistentAttributes.loginName = userName;
+      attributesManager.savePersistentAttributes();
+    }
 
     if (await ddb.checkUserExists(userName, gender)) {
       // Sets speechText to the first half of the description. 1 = first-half 2 = seconf-half
@@ -60,8 +90,7 @@ const CompletedGetNameGenderIntentHandler = {
       sessionAttributes.dialog = 'First description read.';
       sessionAttributes.description = await ddb.getDescription(userName, gender, 1);
       sessionAttributes.description2 = await ddb.getDescription(userName, gender, 2);
-
-      await handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+      await attributesManager.setSessionAttributes(sessionAttributes);
 
       return handlerInput.responseBuilder
         .speak(speechText)
@@ -86,6 +115,7 @@ const CompletedGetNameGenderIntentHandler = {
         .getResponse();
     }
     sessionAttributes.dialog = 'First description read.';
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -137,7 +167,7 @@ const ContinueDescriptionIntentHandler = {
     }
     const speechText = 'Would you like to hear about another name?';
     sessionAttributes.dialog = 'Second description read.';
-
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -202,14 +232,15 @@ const HelpIntentHandler = {
 const CancelAndStopIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent' 
-      || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent')
+      && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent'
+      || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent');
   },
   handle(handlerInput) {
     const speechText = 'Yes? Would you like to hear about another name?';
 
     return handlerInput.responseBuilder
       .speak(speechText)
+      .withShouldEndSession(false)
       .getResponse();
   },
 };
@@ -221,10 +252,10 @@ const SessionEndedRequestHandler = {
   },
   handle(handlerInput) {
     const speechText = 'Goodbye';
-    console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
 
     return handlerInput.responseBuilder
       .speak(speechText)
+      .withShouldEndSession(true)
       .getResponse();
   },
 };
@@ -258,10 +289,83 @@ const FallbackHandler = {
     return handlerInput.responseBuilder
       .speak('I didnt get that, Name and gender please?')
       .reprompt(reprompt)
+      .withShouldEndSession(false)
       .getResponse();
   },
 };
 
+const InprogressResetLoginNameHandler = {
+  canHandle(handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+    && handlerInput.requestEnvelope.request.intent.name === 'NewLoginNameIntent'
+    && sessionAttributes.dialog !== 'loginName';
+  },
+  async handle(handlerInput) {
+    const attributesManager = handlerInput.attributesManager;
+    const sessionAttributes = attributesManager.getSessionAttributes();
+    const persistentAttributes = await attributesManager.getPersistentAttributes() || {};
+    const loginName = persistentAttributes.loginName;
+    const speechText = `${loginName} please give me a new login name`;
+    sessionAttributes.dialog = 'loginName';
+    attributesManager.setSessionAttributes(sessionAttributes);
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .withShouldEndSession(false)
+      .getResponse();
+  },
+};
+
+const ResetLoginNameHandler = {
+  canHandle(handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+    && handlerInput.requestEnvelope.request.intent.name === 'LoginNameChangeIntent'
+    && sessionAttributes.dialog === 'loginName';
+  },
+  async handle(handlerInput) {
+    const attributesManager = handlerInput.attributesManager;
+    const sessionAttributes = attributesManager.getSessionAttributes();
+    const slots = handlerInput.requestEnvelope.request.intent.slots;
+    const loginName = slots.loginName.value;
+    sessionAttributes.dialog = 'Started';
+    attributesManager.setSessionAttributes(sessionAttributes);
+
+    const persistentAttributes = await attributesManager.getPersistentAttributes() || {};
+    persistentAttributes.loginName = loginName;
+    await attributesManager.savePersistentAttributes();
+
+    const speechText = `Your name has been updated to ${loginName}. Please give me another name and gender to continue or you can say exit.`;
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .withShouldEndSession(false)
+      .getResponse();
+  },
+};
+
+const RestartAppIntentHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+    && handlerInput.requestEnvelope.request.intent.name === 'RestartAppIntent';
+  },
+  handle(handlerInput) {
+    const speechText = 'Starting over, can I get that name and gender?';
+    const attributesManager = handlerInput.attributesManager;
+    const sessionAttributes = attributesManager.getSessionAttributes();
+    sessionAttributes.dialog = 'Started';
+    attributesManager.setSessionAttributes(sessionAttributes);
+    attributesManager.savePersistentAttributes();
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .withShouldEndSession(false)
+      .getResponse();
+  },
+};
 
 const ErrorHandler = {
   canHandle() {
@@ -279,18 +383,23 @@ const ErrorHandler = {
   },
 };
 
-exports.handler = Alexa.SkillBuilders.custom()
+exports.handler = Alexa.SkillBuilders.standard()
   .addRequestHandlers(
     LaunchRequestHandler,
     InProgressGetNameGenderIntentHandler,
     CompletedGetNameGenderIntentHandler,
     ContinueDescriptionIntentHandler,
+    InprogressResetLoginNameHandler,
     RestartorEndIntentHandler,
+    ResetLoginNameHandler,
     DatabaseTimeoutIntentHandler,
+    RestartAppIntentHandler,
     HelpIntentHandler,
     FallbackHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler,
   )
+  .withTableName('High-Low-Game')
+  .withAutoCreateTable(true)
   .addErrorHandlers(ErrorHandler)
   .lambda();
