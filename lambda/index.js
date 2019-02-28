@@ -17,7 +17,7 @@ const LaunchRequestHandler = {
     // await attributesManager.deletePersistentAttributes(); <---- is for testing purposes.
     const loginName = persistentAttributes.loginName;
     const sessionAttributes = attributesManager.getSessionAttributes();
-    sessionAttributes.dialog = 'Started';
+    sessionAttributes.state = 'Started';
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
     // Checks to see if the user has logged in before.
@@ -45,11 +45,11 @@ const InProgressGetNameGenderIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
       && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameGenderIntent'
-      && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED'; // Will not move to next intent until dialog state === 'COMPLETED' by filling required slot values
+      && handlerInput.requestEnvelope.request.dialogState !== 'COMPLETED'; // Will not move to next intent until state state === 'COMPLETED' by filling required slot values
   },
   handle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    sessionAttributes.dialog = 'Started';
+    sessionAttributes.state = 'Started';
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
     return handlerInput.responseBuilder
@@ -62,8 +62,12 @@ const InProgressGetNameGenderIntentHandler = {
 
 const CompletedGetNameGenderIntentHandler = {
   canHandle(handlerInput) {
+    const attributesManager = handlerInput.attributesManager;
+    const sessionAttributes = attributesManager.getSessionAttributes();
+
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
     && handlerInput.requestEnvelope.request.intent.name === 'UserFirstNameGenderIntent'
+    && sessionAttributes.state !== 'loginName'
     && handlerInput.requestEnvelope.request.dialogState === 'COMPLETED';
   },
   async handle(handlerInput) {
@@ -71,12 +75,20 @@ const CompletedGetNameGenderIntentHandler = {
     const slots = handlerInput.requestEnvelope.request.intent.slots;
     const userName = slots.userName.value;
     const gender = slots.gender.value;
+    // console.log(slots.gender['resolutions']['resolutionsPerAuthority'][0]['status']['code'])
 
     const persistentAttributes = await attributesManager.getPersistentAttributes() || {};
     const sessionAttributes = attributesManager.getSessionAttributes();
 
     sessionAttributes.userName = userName;
     sessionAttributes.gender = gender;
+
+    // if (getSlotValues(slots)) {
+    //   const slotValues = getSlotValues(slots).gender.resolved;
+    //   console.log(slotValues)
+
+    // }
+
     // Checks if User has logged in before, if not sets user's login name permanantly.
     if (!persistentAttributes.loginName) {
       persistentAttributes.loginName = userName;
@@ -86,8 +98,8 @@ const CompletedGetNameGenderIntentHandler = {
     if (await ddb.checkUserExists(userName, gender)) {
       // Sets speechText to the first half of the description. 1 = first-half 2 = seconf-half
       const speechText = `${await ddb.getDescription(userName, gender, 1)} Would you like to hear more?`;
-      // SessionAttributes.Dialog lets future Intent Handlers know what part of the dialog tree the Alexa skill is at
-      sessionAttributes.dialog = 'First description read.';
+      // SessionAttributes.Dialog lets future Intent Handlers know what part of the state tree the Alexa skill is at
+      sessionAttributes.state = 'First description read.';
       sessionAttributes.description = await ddb.getDescription(userName, gender, 1);
       sessionAttributes.description2 = await ddb.getDescription(userName, gender, 2);
       await attributesManager.setSessionAttributes(sessionAttributes);
@@ -108,13 +120,13 @@ const CompletedGetNameGenderIntentHandler = {
 
     // Performing three consecutive async calls occasionally times-out the Alexa skill. This allows the user to still hear first half of skill in case of timeout
     if (speechText === '[object Object] Would you like to hear more?') {
-      sessionAttributes.dialog = 'Description timed out.';
+      sessionAttributes.state = 'Description timed out.';
       return handlerInput.responseBuilder
         .speak('That took awhile. Would you like to hear the description now?')
         .withShouldEndSession(false)
         .getResponse();
     }
-    sessionAttributes.dialog = 'First description read.';
+    sessionAttributes.state = 'First description read.';
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
     return handlerInput.responseBuilder
@@ -129,14 +141,14 @@ const DatabaseTimeoutIntentHandler = {
   canHandle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-    && sessionAttributes.dialog === 'Description timed out.'
+    && sessionAttributes.state === 'Description timed out.'
     && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent'
     || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.NoIntent');
   },
   handle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     const speechText = `${sessionAttributes.description} Would you like to hear more?`;
-    sessionAttributes.dialog = 'First description read.';
+    sessionAttributes.state = 'First description read.';
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -151,7 +163,7 @@ const ContinueDescriptionIntentHandler = {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-    && sessionAttributes.dialog === 'First description read.'
+    && sessionAttributes.state === 'First description read.'
     && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent'
     || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.NoIntent');
   },
@@ -159,14 +171,14 @@ const ContinueDescriptionIntentHandler = {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
     if (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent') {
       const speechText = `${sessionAttributes.description2} Would you like to hear about another name?`;
-      sessionAttributes.dialog = 'Second description read.';
+      sessionAttributes.state = 'Second description read.';
       return handlerInput.responseBuilder
         .speak(speechText)
         .withShouldEndSession(false)
         .getResponse();
     }
     const speechText = 'Would you like to hear about another name?';
-    sessionAttributes.dialog = 'Second description read.';
+    sessionAttributes.state = 'Second description read.';
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
     return handlerInput.responseBuilder
@@ -182,7 +194,7 @@ const RestartorEndIntentHandler = {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
 
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-    && sessionAttributes.dialog === 'Second description read.'
+    && sessionAttributes.state === 'Second description read.'
     && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent'
     || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.NoIntent');
   },
@@ -270,18 +282,21 @@ const FallbackHandler = {
 
   handle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    const slotValues = getSlotValues(handlerInput.requestEnvelope.request.intent.slots);
+    console.log(slotValues)
 
-    if (sessionAttributes.dialog === 'First description read.') {
+
+    if (sessionAttributes.state === 'First description read.') {
       return handlerInput.responseBuilder
         .speak('Sorry I couldnt understand you. Would you like me to continue with the description?')
         .getResponse();
     }
-    if (sessionAttributes.dialog === 'Second description read.') {
+    if (sessionAttributes.state === 'Second description read.') {
       return handlerInput.responseBuilder
         .speak('Sorry I couldnt understand you. Would you like me to read another name?')
         .getResponse();
     }
-    if (sessionAttributes.dialog === 'Description timed out.') {
+    if (sessionAttributes.state === 'Description timed out.') {
       return handlerInput.responseBuilder
         .speak('Sorry I didint quite get that. Would you like me to begin the description?')
         .getResponse();
@@ -300,7 +315,7 @@ const InprogressResetLoginNameHandler = {
 
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
     && handlerInput.requestEnvelope.request.intent.name === 'NewLoginNameIntent'
-    && sessionAttributes.dialog !== 'loginName';
+    && sessionAttributes.state !== 'loginName';
   },
   async handle(handlerInput) {
     const attributesManager = handlerInput.attributesManager;
@@ -308,7 +323,7 @@ const InprogressResetLoginNameHandler = {
     const persistentAttributes = await attributesManager.getPersistentAttributes() || {};
     const loginName = persistentAttributes.loginName;
     const speechText = `${loginName} please give me a new login name`;
-    sessionAttributes.dialog = 'loginName';
+    sessionAttributes.state = 'loginName';
     attributesManager.setSessionAttributes(sessionAttributes);
 
     return handlerInput.responseBuilder
@@ -324,15 +339,12 @@ const ResetLoginNameHandler = {
 
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
     && handlerInput.requestEnvelope.request.intent.name === 'LoginNameChangeIntent'
-    && sessionAttributes.dialog === 'loginName';
+    && sessionAttributes.state === 'loginName';
   },
   async handle(handlerInput) {
     const attributesManager = handlerInput.attributesManager;
-    const sessionAttributes = attributesManager.getSessionAttributes();
     const slots = handlerInput.requestEnvelope.request.intent.slots;
     const loginName = slots.loginName.value;
-    sessionAttributes.dialog = 'Started';
-    attributesManager.setSessionAttributes(sessionAttributes);
 
     const persistentAttributes = await attributesManager.getPersistentAttributes() || {};
     persistentAttributes.loginName = loginName;
@@ -356,7 +368,7 @@ const RestartAppIntentHandler = {
     const speechText = 'Starting over, can I get that name and gender?';
     const attributesManager = handlerInput.attributesManager;
     const sessionAttributes = attributesManager.getSessionAttributes();
-    sessionAttributes.dialog = 'Started';
+    sessionAttributes.state = 'Started';
     attributesManager.setSessionAttributes(sessionAttributes);
     attributesManager.savePersistentAttributes();
 
@@ -382,6 +394,49 @@ const ErrorHandler = {
       .getResponse();
   },
 };
+
+function getSlotValues(filledSlots) {
+  const slotValues = {};
+  
+  // console.log(`The filled slots: ${JSON.stringify(filledSlots)}`);
+  Object.keys(filledSlots).forEach((item) => {
+    const name = filledSlots[item].name;
+
+    if (filledSlots[item] &&
+      filledSlots[item].resolutions &&
+      filledSlots[item].resolutions.resolutionsPerAuthority[0] &&
+      filledSlots[item].resolutions.resolutionsPerAuthority[0].status &&
+      filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
+      switch (filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
+        case 'ER_SUCCESS_MATCH':
+          slotValues[name] = {
+            synonym: filledSlots[item].value,
+            resolved: filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.name,
+            resolvedId: filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.id,
+            isValidated: true,
+          };
+          break;
+        case 'ER_SUCCESS_NO_MATCH':
+          slotValues[name] = {
+            synonym: filledSlots[item].value,
+            resolved: filledSlots[item].value,
+            isValidated: false,
+          };
+          break;
+        default:
+          break;
+      }
+    } else {
+      slotValues[name] = {
+        synonym: filledSlots[item].value,
+        resolved: filledSlots[item].value,
+        isValidated: false,
+      };
+    }
+  }, this);
+
+  return slotValues;
+}
 
 exports.handler = Alexa.SkillBuilders.standard()
   .addRequestHandlers(
