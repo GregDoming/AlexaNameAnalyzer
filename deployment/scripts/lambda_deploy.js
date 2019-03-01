@@ -38,7 +38,7 @@ lambda.updateFunctionCode(updateFunctionParams, (err, data) => {
   else console.log(data);
 });
 
-// Updates Lambda Function settings, there are many settings I am not interacting with yet.
+// Updates Lambda Function settings, there are many settings I am not implementing yet.
 lambda.updateFunctionConfiguration(updateFunctionConfiguration, (err, data) => {
   if (err) console.log(err, err.stack);
   else console.log(data);

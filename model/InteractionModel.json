@@ -35,7 +35,8 @@
             "leave",
             "quit",
             "end",
-            "stop"
+            "stop",
+            "testtesttest"
           ]
         },
         {
@@ -87,13 +88,17 @@
         {
           "name": "AMAZON.YesIntent",
           "samples": [
+            "yes",
             "keep going",
             "please continue"
           ]
         },
         {
           "name": "AMAZON.NoIntent",
-          "samples": []
+          "samples": [
+            "no thanks",
+            "no"
+          ]
         },
         {
           "name": "AMAZON.FallbackIntent",
@@ -103,6 +108,14 @@
           "name": "UserFirstNameGenderIntent",
           "slots": [
             {
+              "name": "userName",
+              "type": "AMAZON.US_FIRST_NAME",
+              "samples": [
+                "my name is {userName}",
+                "{userName}"
+              ]
+            },
+            {
               "name": "gender",
               "type": "USER_GENDER",
               "samples": [
@@ -110,28 +123,76 @@
                 "I am {gender}",
                 "{gender}"
               ]
-            },
-            {
-              "name": "userName",
-              "type": "AMAZON.US_FIRST_NAME",
-              "samples": [
-                "my name is {userName}",
-                "{userName}"
-              ]
             }
           ],
           "samples": [
+            "{userName} {gender}",
+            "I am {userName}",
+            "I am {gender}",
+            "my name is {userName}",
+            "my name is {userName} {gender}",
             "they call me {userName}",
             "people call me {userName}",
-            "{gender}",
             "my name is {userName} and I am {gender}",
             "my name is {userName} and Im {gender}",
             "{userName}",
-            "{gender} {userName}",
             "{gender} is how I identify",
             "{gender} they call me {userName}",
             "{userName}  {gender}",
             "my name is {userName} and I am a {gender}"
+          ]
+        },
+        {
+          "name": "NewLoginNameIntent",
+          "slots": [
+            {
+              "name": "login",
+              "type": "NEW_LOGIN_NAME"
+            }
+          ],
+          "samples": [
+            "{login}",
+            "update {login}",
+            "change {login}",
+            "update {login} name",
+            "set a new {login} name",
+            "change my {login}",
+            "Alexa change my {login}",
+            "give me a new {login}",
+            "Alexa please change my {login}"
+          ]
+        },
+        {
+          "name": "LoginNameChangeIntent",
+          "slots": [
+            {
+              "name": "loginName",
+              "type": "AMAZON.US_FIRST_NAME"
+            }
+          ],
+          "samples": [
+            "{loginName}",
+            "name is {loginName}",
+            "can I change my {loginName}",
+            "{loginName} is my name",
+            "my name is {loginName}"
+          ]
+        },
+        {
+          "name": "RestartAppIntent",
+          "slots": [
+            {
+              "name": "restart",
+              "type": "RESTART_APP"
+            }
+          ],
+          "samples": [
+            "move to the {restart}",
+            "{restart} at beginning",
+            "{restart} to beginning",
+            "{restart} again",
+            " {restart} over",
+            "{restart}"
           ]
         }
       ],
@@ -143,6 +204,8 @@
               "name": {
                 "value": "male",
                 "synonyms": [
+                  "dude",
+                  "guy",
                   "mr.",
                   "mister",
                   "boy",
@@ -248,6 +311,41 @@
             }
           ],
           "name": "AMAZON.US_FIRST_NAME"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "id"
+              }
+            },
+            {
+              "name": {
+                "value": "username"
+              }
+            },
+            {
+              "name": {
+                "value": "login"
+              }
+            }
+          ],
+          "name": "NEW_LOGIN_NAME"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "Restart",
+                "synonyms": [
+                  "reset",
+                  "start",
+                  "start over"
+                ]
+              }
+            }
+          ],
+          "name": "RESTART_APP"
         }
       ]
     },
@@ -258,6 +356,15 @@
           "confirmationRequired": false,
           "prompts": {},
           "slots": [
+            {
+              "name": "userName",
+              "type": "AMAZON.US_FIRST_NAME",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.1434176355395.1054653588021"
+              }
+            },
             {
               "name": "gender",
               "type": "USER_GENDER",
@@ -272,18 +379,39 @@
                   "prompt": "Slot.Validation.389575863017.695600803755.106994337216"
                 }
               ]
-            },
+            }
+          ],
+          "delegationStrategy": "ALWAYS"
+        },
+        {
+          "name": "NewLoginNameIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
             {
-              "name": "userName",
+              "name": "login",
+              "type": "NEW_LOGIN_NAME",
+              "elicitationRequired": false,
+              "confirmationRequired": false,
+              "prompts": {}
+            }
+          ]
+        },
+        {
+          "name": "LoginNameChangeIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "loginName",
               "type": "AMAZON.US_FIRST_NAME",
               "elicitationRequired": true,
               "confirmationRequired": false,
               "prompts": {
-                "elicitation": "Elicit.Slot.1434176355395.1054653588021"
+                "elicitation": "Elicit.Slot.335895869873.112506250542"
               }
             }
-          ],
-          "delegationStrategy": "ALWAYS"
+          ]
         }
       ],
       "delegationStrategy": "ALWAYS"
@@ -321,6 +449,41 @@
           {
             "type": "PlainText",
             "value": "{gender} is not a gender, what sex do you identify as?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.525163404236.324706892869",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "please give me a new name"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.628252185755.839166921451",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Login name please"
+          },
+          {
+            "type": "PlainText",
+            "value": "Please give me a new login name"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.335895869873.112506250542",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "names don't grow on trees"
+          },
+          {
+            "type": "PlainText",
+            "value": "name please"
           }
         ]
       }

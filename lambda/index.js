@@ -83,12 +83,6 @@ const CompletedGetNameGenderIntentHandler = {
     sessionAttributes.userName = userName;
     sessionAttributes.gender = gender;
 
-    // if (getSlotValues(slots)) {
-    //   const slotValues = getSlotValues(slots).gender.resolved;
-    //   console.log(slotValues)
-
-    // }
-
     // Checks if User has logged in before, if not sets user's login name permanantly.
     if (!persistentAttributes.loginName) {
       persistentAttributes.loginName = userName;
@@ -282,9 +276,6 @@ const FallbackHandler = {
 
   handle(handlerInput) {
     const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    const slotValues = getSlotValues(handlerInput.requestEnvelope.request.intent.slots);
-    console.log(slotValues)
-
 
     if (sessionAttributes.state === 'First description read.') {
       return handlerInput.responseBuilder
@@ -402,49 +393,6 @@ const ErrorHandler = {
       .getResponse();
   },
 };
-
-function getSlotValues(filledSlots) {
-  const slotValues = {};
-  
-  // console.log(`The filled slots: ${JSON.stringify(filledSlots)}`);
-  Object.keys(filledSlots).forEach((item) => {
-    const name = filledSlots[item].name;
-
-    if (filledSlots[item] &&
-      filledSlots[item].resolutions &&
-      filledSlots[item].resolutions.resolutionsPerAuthority[0] &&
-      filledSlots[item].resolutions.resolutionsPerAuthority[0].status &&
-      filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
-      switch (filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
-        case 'ER_SUCCESS_MATCH':
-          slotValues[name] = {
-            synonym: filledSlots[item].value,
-            resolved: filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.name,
-            resolvedId: filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.id,
-            isValidated: true,
-          };
-          break;
-        case 'ER_SUCCESS_NO_MATCH':
-          slotValues[name] = {
-            synonym: filledSlots[item].value,
-            resolved: filledSlots[item].value,
-            isValidated: false,
-          };
-          break;
-        default:
-          break;
-      }
-    } else {
-      slotValues[name] = {
-        synonym: filledSlots[item].value,
-        resolved: filledSlots[item].value,
-        isValidated: false,
-      };
-    }
-  }, this);
-
-  return slotValues;
-}
 
 exports.handler = Alexa.SkillBuilders.standard()
   .addRequestHandlers(
