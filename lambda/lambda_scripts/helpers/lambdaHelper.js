@@ -4,7 +4,7 @@ const getSlotValues = (filledSlots) => {
   const slotValues = {};
   // console.log(`The filled slots: ${JSON.stringify(filledSlots)}`);
   Object.keys(filledSlots).forEach((item) => {
-    const {name} = filledSlots[item];
+    const { name } = filledSlots[item];
 
     if (filledSlots[item]
       && filledSlots[item].resolutions

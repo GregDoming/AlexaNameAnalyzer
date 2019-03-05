@@ -3,8 +3,12 @@
 const Alexa = require('ask-sdk');
 const scrape = require('./scraper/paragraphGenerator.js');
 const ddb = require('./dynamoDB/ddb_methods.js');
+const model = require('./model/getSynonyms.js');
 
 const reprompt = 'Surrender your name and gender';
+const modelObj = model.getSynonyms();
+const maleSynonymsArr = modelObj.userGender[0].male;
+const femaleSynonymsArr = modelObj.userGender[1].female;
 
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
@@ -74,7 +78,11 @@ const CompletedGetNameGenderIntentHandler = {
     const attributesManager = handlerInput.attributesManager;
     const slots = handlerInput.requestEnvelope.request.intent.slots;
     const userName = slots.userName.value;
-    const gender = slots.gender.value;
+
+    // Checks the created arrays values and conforms them to male female binary
+    let gender;
+    if (maleSynonymsArr.indexOf(slots.gender.value) !== -1) gender = 'male';
+    if (femaleSynonymsArr.indexOf(slots.gender.value) !== -1) gender = 'female';
     // console.log(slots.gender['resolutions']['resolutionsPerAuthority'][0]['status']['code'])
 
     const persistentAttributes = await attributesManager.getPersistentAttributes() || {};

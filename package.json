@@ -6,8 +6,8 @@
   "scripts": {
     "test": "mocha",
     "update": "node deployment/scripts/lambda_deploy.js",
-    "update-manifest": "node deployment/scripts/lambda_deploy.js && ask api get-model -s amzn1.ask.skill.470fcaa9-d8d9-4c48-8ac3-37b8425bd784 --stage development -l en-US > model/InteractionModel.json",
-    "upload-manifest": "ask api update-model --skill-id amzn1.ask.skill.470fcaa9-d8d9-4c48-8ac3-37b8425bd784 --file model/UpdateModel.json --locale en-US"
+    "update-manifest": "node deployment/scripts/lambda_deploy.js && ask api get-model -s amzn1.ask.skill.470fcaa9-d8d9-4c48-8ac3-37b8425bd784 --stage development -l en-US > lambda/model/InteractionModel.json",
+    "upload-manifest": "ask api update-model --skill-id amzn1.ask.skill.470fcaa9-d8d9-4c48-8ac3-37b8425bd784 --file lambda/model/UpdateModel.json --locale en-US"
   },
   "repository": {
     "type": "git",
