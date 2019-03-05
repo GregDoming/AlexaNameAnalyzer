@@ -126,6 +126,12 @@
             }
           ],
           "samples": [
+            "my name is {userName} and {gender}",
+            "name is {userName} and gender is {gender}",
+            "name is {userName} and {gender}",
+            "name is {userName} gender {gender}",
+            "name is {userName} gender is {gender}",
+            "name {userName} gender {gender}",
             "{userName} {gender}",
             "I am {userName}",
             "I am {gender}",
@@ -219,6 +225,7 @@
               "name": {
                 "value": "female",
                 "synonyms": [
+                  "chick",
                   "miss",
                   "ms",
                   "mrs",

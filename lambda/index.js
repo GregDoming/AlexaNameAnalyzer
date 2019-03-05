@@ -418,7 +418,7 @@ exports.handler = Alexa.SkillBuilders.standard()
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler,
   )
-  .withTableName('High-Low-Game')
+  .withTableName('userPersistantValues')
   .withAutoCreateTable(true)
   .addErrorHandlers(ErrorHandler)
   .lambda();
