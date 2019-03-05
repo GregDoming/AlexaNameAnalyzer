@@ -6,6 +6,7 @@ npm run test - Zips file and uploads it to aws Lambda.
 npm run update manifest - Zips file, uploads it to aws Lambda, and downloads the Alexa Skills Interaction Model at model/InteractionModel.json.
 npm run upload-manifest - Uploads the manifest from model/UpdateModel.json to the Alexa Skills Interaction Model developer console.
 ```
+**Say, "change username" to change your persistant login name."**
 
 This is assuming you have your aws developer environment setup on your local machine.
 
