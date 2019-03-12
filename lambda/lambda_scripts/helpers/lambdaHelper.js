@@ -1,5 +1,5 @@
-console.log('greg ');
-
+// eslint-disable-next-line max-len
+// Helper function copied from web to get innter request values like if the dialog resolved with what word etc.
 const getSlotValues = (filledSlots) => {
   const slotValues = {};
   // console.log(`The filled slots: ${JSON.stringify(filledSlots)}`);
