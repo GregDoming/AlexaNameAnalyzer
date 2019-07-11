@@ -98,7 +98,7 @@ const CompletedGetNameGenderIntentHandler = {
     }
 
     if (await ddb.checkUserExists(userName, gender)) {
-      // Sets speechText to the first half of the description. 1 = first-half 2 = seconf-half
+      // Set speechText to the first half of the description. 1 = first-half 2 = seconf-half
       const speechText = `${await ddb.getDescription(userName, gender, 1)} Would you like to hear more?`;
       // SessionAttributes.Dialog lets future Intent Handlers know what part of the state tree the Alexa skill is at
       sessionAttributes.state = 'First description read.';
