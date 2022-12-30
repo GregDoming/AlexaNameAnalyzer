@@ -39,7 +39,7 @@
     "cheerio": "^1.0.0-rc.2",
     "dynalite": "^2.2.0",
     "fs": "0.0.1-security",
-    "mocha": "^6.1.4",
+    "mocha": "^10.2.0",
     "path": "^0.12.7",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
